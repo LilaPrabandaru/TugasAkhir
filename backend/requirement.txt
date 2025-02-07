@@ -1,0 +1,6 @@
+flask
+flask-restful
+pymongo
+werkzeug
+requests
+gunicorn==20.1.0
