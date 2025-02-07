@@ -49,7 +49,15 @@ class Database:
         try:
             collection = self.db[collection_name]
             resultFind = collection.find(filter)
+
+            # Konversi ke list
             data = list(resultFind)
+
+            # Debugging Output
+            print(f"DEBUG: findMany - Jumlah data ditemukan: {len(data)}")
+            for item in data:
+                print(f"DEBUG: Data item: {item}")  
+
             status = True
         except errors.PyMongoError as pymongoError:
             print(f"Gagal find many data, error pymongo: {pymongoError}")

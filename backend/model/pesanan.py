@@ -35,6 +35,8 @@ class Pesanan:
         result = {'status': False, 'data': None, 'message': ''}
         status, data = self.connection.findMany(collection_name=MONGO_PESANAN_COLLECTION, filter={})
 
+        print(f"Data dari findMany: {data}")  # Debugging
+
         result['status'] = status
         result['data'] = data
 
@@ -49,6 +51,8 @@ class Pesanan:
             result['status'] = True
             result['message'] = 'Successfully Retrieved Order Data'
         return result
+
+
     
     def findPesananTanggal(self, tanggal):
         result = {'status': False, 'data': None, 'message': ''}
