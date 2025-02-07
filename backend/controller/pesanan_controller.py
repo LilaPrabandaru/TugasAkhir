@@ -13,7 +13,7 @@ parser = reqparse.RequestParser()
 #     except ValueError:
 #         raise argparse.ArgumentTypeError("Format tanggal harus YYYY-MM-DD")
 
-parser.add_argument('Nama Pelanggan', 
+parser.add_argument('Nama_Pelanggan', 
                     type=str, 
                     required=True, 
                     help="Parameter 'Nama Pelanggan' Can Not be Blank"
@@ -65,7 +65,7 @@ class AddPesanan(Resource):
         args = parser.parse_args()
         args = parser.parse_args()
         data = {
-                'Nama Pelanggan': args['Nama Pelanggan'],
+                'Nama_Pelanggan': args['Nama_Pelanggan'],
                 'Tanggal': args['Tanggal'],
                 'Waktu': args['Waktu'],
                 'Detail':[]

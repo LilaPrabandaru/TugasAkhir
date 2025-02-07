@@ -6,10 +6,10 @@ from model.karyawan import Karyawan
 Karyawan_model = Karyawan()
 
 parser = reqparse.RequestParser()
-parser.add_argument('Nama Lengkap', type=str, required=True, help="Parameter 'Nama Lengkap' Tidak Boleh Kosong")
+parser.add_argument('Nama_Lengkap', type=str, required=True, help="Parameter 'Nama Lengkap' Tidak Boleh Kosong")
 parser.add_argument('Email', type=str, required=True, help="Parameter 'Email' Tidak Boleh Kosong")
-parser.add_argument('Nomor Telp', type=str, required=True, help="Parameter 'Nomor Telp' Tidak Boleh Kosong")
-parser.add_argument('Tanggal Lahir', type=str, required=True, help="Parameter 'Tanggal Lahir' Tidak Boleh Kosong")
+parser.add_argument('Nomor_Telp', type=str, required=True, help="Parameter 'Nomor Telp' Tidak Boleh Kosong")
+parser.add_argument('Tanggal_Lahir', type=str, required=True, help="Parameter 'Tanggal Lahir' Tidak Boleh Kosong")
 
 class GetKaryawan(Resource):
     def get(self):
@@ -23,10 +23,10 @@ class AddKaryawan(Resource):
     def post(self):
             args = parser.parse_args()
             data = {
-                'Nama Lengkap': args['Nama Lengkap'],
+                'Nama_Lengkap': args['Nama_Lengkap'],
                 'Email': args['Email'],
-                'Nomor Telp': args['Nomor Telp'],
-                'Tanggal Lahir': args['Tanggal Lahir'],
+                'Nomor_Telp': args['Nomor_Telp'],
+                'Tanggal_Lahir': args['Tanggal_Lahir'],
             }
 
             result = Karyawan_model.insertKaryawan(data)

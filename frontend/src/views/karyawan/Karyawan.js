@@ -1,182 +1,188 @@
-import React from 'react'
-import { CCard, CCardBody, CCol, CCardHeader, CRow } from '@coreui/react'
+import React, { useState, useEffect } from 'react'
 import {
-  CChartBar,
-  CChartDoughnut,
-  CChartLine,
-  CChartPie,
-  CChartPolarArea,
-  CChartRadar,
-} from '@coreui/react-chartjs'
-import { DocsLink } from 'src/components'
+  CTable,
+  CTableHead,
+  CTableRow,
+  CTableHeaderCell,
+  CTableBody,
+  CTableDataCell,
+  CButton,
+  CModal,
+  CModalHeader,
+  CModalTitle,
+  CModalBody,
+  CModalFooter,
+  CForm,
+  CFormInput,
+  CCard,
+  CCardHeader,
+  CCardBody,
+} from '@coreui/react'
+import {
+  getKaryawan,
+  addKaryawan,
+  updateKaryawan,
+  deleteKaryawan,
+} from 'src/services/karyawanService'
+import CIcon from '@coreui/icons-react'
+import { cilPencil, cilTrash } from '@coreui/icons'
 
 const Karyawan = () => {
-  // const random = () => Math.round(Math.random() * 100)
+  const [karyawanList, setKaryawanList] = useState([])
+  const [modal, setModal] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const [selectedKaryawan, setSelectedKaryawan] = useState(null)
+  const [deleteId, setDeleteId] = useState(null)
+  const [formData, setFormData] = useState({
+    Email: '',
+    Nama_Lengkap: '',
+    Nomor_Telp: '',
+    Tanggal_Lahir: '',
+  })
+
+  useEffect(() => {
+    fetchData()
+  }, [])
+
+  const fetchData = async () => {
+    try {
+      const data = await getKaryawan()
+      setKaryawanList(data)
+    } catch (error) {
+      console.error('Error fetching karyawan:', error)
+    }
+  }
+
+  const handleSave = async () => {
+    try {
+      if (selectedKaryawan) {
+        await updateKaryawan(selectedKaryawan._id, formData)
+      } else {
+        await addKaryawan(formData)
+      }
+      fetchData()
+      setModal(false)
+    } catch (error) {
+      console.error('Error saving karyawan:', error)
+    }
+  }
+
+  const handleDelete = async () => {
+    try {
+      await deleteKaryawan(deleteId)
+      fetchData()
+      setConfirmDelete(false)
+    } catch (error) {
+      console.error('Error deleting karyawan:', error)
+    }
+  }
+
+  const openDeleteModal = (_id) => {
+    setDeleteId(_id)
+    setConfirmDelete(true)
+  }
+
+  const openModal = (karyawan = null) => {
+    setSelectedKaryawan(karyawan)
+    setFormData(karyawan || { Email: '', Nama_Lengkap: '', Nomor_Telp: '', Tanggal_Lahir: '' })
+    setModal(true)
+  }
 
   return (
-    <CRow>
-      <CCol xs={12}></CCol>
-      <CCol xs={6}>
-        <CCard className="mb-4">
-          <CCardHeader>
-            Bar Chart <DocsLink name="chart" />
-          </CCardHeader>
-          <CCardBody>
-            <CChartBar
-              data={{
-                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-                datasets: [
-                  {
-                    label: 'GitHub Commits',
-                    backgroundColor: '#f87979',
-                    data: [40, 20, 12, 39, 10, 40, 39, 80, 40],
-                  },
-                ],
-              }}
-              labels="months"
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
+        <CButton color="primary" onClick={() => openModal()}>
+          Tambah Karyawan
+        </CButton>
+      </div>
+      <CCard className="mt-4">
+        <CCardHeader>Karyawan</CCardHeader>
+        <CCardBody>
+          <CTable>
+            <CTableHead>
+              <CTableRow>
+                <CTableHeaderCell>Email</CTableHeaderCell>
+                <CTableHeaderCell>Nama Lengkap</CTableHeaderCell>
+                <CTableHeaderCell>Nomor Telpon</CTableHeaderCell>
+                <CTableHeaderCell>Tanggal Lahir</CTableHeaderCell>
+                <CTableHeaderCell>Aksi</CTableHeaderCell>
+              </CTableRow>
+            </CTableHead>
+            <CTableBody>
+              {karyawanList.map((karyawan) => (
+                <CTableRow key={karyawan._id}>
+                  <CTableDataCell>{karyawan.Email}</CTableDataCell>
+                  <CTableDataCell>{karyawan.Nama_Lengkap}</CTableDataCell>
+                  <CTableDataCell>{karyawan.Nomor_Telp}</CTableDataCell>
+                  <CTableDataCell>{karyawan.Tanggal_Lahir}</CTableDataCell>
+                  <CTableDataCell>
+                    <CButton color="warning" onClick={() => openModal(karyawan)}>
+                      <CIcon icon={cilPencil} />
+                    </CButton>{' '}
+                    <CButton color="danger" onClick={() => openDeleteModal(karyawan._id)}>
+                      <CIcon icon={cilTrash} />
+                    </CButton>
+                  </CTableDataCell>
+                </CTableRow>
+              ))}
+            </CTableBody>
+          </CTable>
+        </CCardBody>
+      </CCard>
+
+      <CModal visible={modal} onClose={() => setModal(false)}>
+        <CModalHeader>
+          <CModalTitle>{selectedKaryawan ? 'Edit Karyawan' : 'Tambah Karyawan'}</CModalTitle>
+        </CModalHeader>
+        <CModalBody>
+          <CForm>
+            <CFormInput
+              label="Email"
+              value={formData.Email}
+              onChange={(e) => setFormData({ ...formData, Email: e.target.value })}
             />
-          </CCardBody>
-        </CCard>
-      </CCol>
-      {/* <CCol xs={6}>
-        <CCard className="mb-4">
-          <CCardHeader>
-            Line Chart <DocsLink name="chart" />
-          </CCardHeader>
-          <CCardBody>
-            <CChartLine
-              data={{
-                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-                datasets: [
-                  {
-                    label: 'My First dataset',
-                    backgroundColor: 'rgba(220, 220, 220, 0.2)',
-                    borderColor: 'rgba(220, 220, 220, 1)',
-                    pointBackgroundColor: 'rgba(220, 220, 220, 1)',
-                    pointBorderColor: '#fff',
-                    data: [random(), random(), random(), random(), random(), random(), random()],
-                  },
-                  {
-                    label: 'My Second dataset',
-                    backgroundColor: 'rgba(151, 187, 205, 0.2)',
-                    borderColor: 'rgba(151, 187, 205, 1)',
-                    pointBackgroundColor: 'rgba(151, 187, 205, 1)',
-                    pointBorderColor: '#fff',
-                    data: [random(), random(), random(), random(), random(), random(), random()],
-                  },
-                ],
-              }}
+            <CFormInput
+              label="Nama Lengkap"
+              value={formData.Nama_Lengkap}
+              onChange={(e) => setFormData({ ...formData, Nama_Lengkap: e.target.value })}
             />
-          </CCardBody>
-        </CCard>
-      </CCol> */}
-      {/* <CCol xs={6}>
-        <CCard className="mb-4">
-          <CCardHeader>
-            Doughnut Chart <DocsLink name="chart" />
-          </CCardHeader>
-          <CCardBody>
-            <CChartDoughnut
-              data={{
-                labels: ['VueJs', 'EmberJs', 'ReactJs', 'AngularJs'],
-                datasets: [
-                  {
-                    backgroundColor: ['#41B883', '#E46651', '#00D8FF', '#DD1B16'],
-                    data: [40, 20, 80, 10],
-                  },
-                ],
-              }}
+            <CFormInput
+              label="Nomor Telepon"
+              value={formData.Nomor_Telp}
+              onChange={(e) => setFormData({ ...formData, Nomor_Telp: e.target.value })}
             />
-          </CCardBody>
-        </CCard>
-      </CCol> */}
-      {/* <CCol xs={6}>
-        <CCard className="mb-4">
-          <CCardHeader>
-            Pie Chart <DocsLink name="chart" />{' '}
-          </CCardHeader>
-          <CCardBody>
-            <CChartPie
-              data={{
-                labels: ['Red', 'Green', 'Yellow'],
-                datasets: [
-                  {
-                    data: [300, 50, 100],
-                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
-                    hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
-                  },
-                ],
-              }}
+            <CFormInput
+              label="Tanggal Lahir"
+              value={formData.Tanggal_Lahir}
+              onChange={(e) => setFormData({ ...formData, Tanggal_Lahir: e.target.value })}
             />
-          </CCardBody>
-        </CCard>
-      </CCol> */}
-      {/* <CCol xs={6}>
-        <CCard className="mb-4">
-          <CCardHeader>
-            Polar Area Chart
-            <DocsLink name="chart" />
-          </CCardHeader>
-          <CCardBody>
-            <CChartPolarArea
-              data={{
-                labels: ['Red', 'Green', 'Yellow', 'Grey', 'Blue'],
-                datasets: [
-                  {
-                    data: [11, 16, 7, 3, 14],
-                    backgroundColor: ['#FF6384', '#4BC0C0', '#FFCE56', '#E7E9ED', '#36A2EB'],
-                  },
-                ],
-              }}
-            />
-          </CCardBody>
-        </CCard>
-      </CCol> */}
-      {/* <CCol xs={6}>
-        <CCard className="mb-4">
-          <CCardHeader>
-            Radar Chart <DocsLink name="chart" />
-          </CCardHeader>
-          <CCardBody>
-            <CChartRadar
-              data={{
-                labels: [
-                  'Eating',
-                  'Drinking',
-                  'Sleeping',
-                  'Designing',
-                  'Coding',
-                  'Cycling',
-                  'Running',
-                ],
-                datasets: [
-                  {
-                    label: 'My First dataset',
-                    backgroundColor: 'rgba(220, 220, 220, 0.2)',
-                    borderColor: 'rgba(220, 220, 220, 1)',
-                    pointBackgroundColor: 'rgba(220, 220, 220, 1)',
-                    pointBorderColor: '#fff',
-                    pointHighlightFill: '#fff',
-                    pointHighlightStroke: 'rgba(220, 220, 220, 1)',
-                    data: [65, 59, 90, 81, 56, 55, 40],
-                  },
-                  {
-                    label: 'My Second dataset',
-                    backgroundColor: 'rgba(151, 187, 205, 0.2)',
-                    borderColor: 'rgba(151, 187, 205, 1)',
-                    pointBackgroundColor: 'rgba(151, 187, 205, 1)',
-                    pointBorderColor: '#fff',
-                    pointHighlightFill: '#fff',
-                    pointHighlightStroke: 'rgba(151, 187, 205, 1)',
-                    data: [28, 48, 40, 19, 96, 27, 100],
-                  },
-                ],
-              }}
-            />
-          </CCardBody>
-        </CCard>
-      </CCol> */}
-    </CRow>
+          </CForm>
+        </CModalBody>
+        <CModalFooter>
+          <CButton color="secondary" onClick={() => setModal(false)}>
+            Batal
+          </CButton>
+          <CButton color="primary" onClick={handleSave}>
+            Simpan
+          </CButton>
+        </CModalFooter>
+      </CModal>
+
+      <CModal visible={confirmDelete} onClose={() => setConfirmDelete(false)}>
+        <CModalHeader>
+          <CModalTitle>Konfirmasi Hapus</CModalTitle>
+        </CModalHeader>
+        <CModalBody>Apakah anda ingin menghapus karyawan ini?</CModalBody>
+        <CModalFooter>
+          <CButton color="secondary" onClick={() => setConfirmDelete(false)}>
+            Batal
+          </CButton>
+          <CButton color="danger" onClick={handleDelete}>
+            Hapus
+          </CButton>
+        </CModalFooter>
+      </CModal>
+    </div>
   )
 }
 

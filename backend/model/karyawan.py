@@ -1,6 +1,5 @@
 from model import Database
 from config import MONGO_DB, MONGO_KARYAWAN_COLLECTION
-from bson import ObjectId
 import random
 import string
 

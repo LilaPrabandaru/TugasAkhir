@@ -130,7 +130,7 @@ const Menu = () => {
     <div>
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
         <CButton color="primary" onClick={() => setModalVisible(true)}>
-          Tambah
+          Tambah Menu
         </CButton>
       </div>
       <CModal visible={modalVisible} onClose={handleCloseModal}>
