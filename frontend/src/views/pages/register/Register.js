@@ -25,6 +25,7 @@ const Register = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault()
+    console.log('Mengirim data:', { email, password }) // Debugging
     try {
       const data = await register(email, password)
       console.log('Registration successful:', data)
