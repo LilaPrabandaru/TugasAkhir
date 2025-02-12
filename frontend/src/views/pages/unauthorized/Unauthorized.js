@@ -1,6 +1,8 @@
 import React from 'react'
 import { CContainer, CRow, CCol, CButton } from '@coreui/react'
-import { Link, useNavigate } from 'react-router-dom'
+import CIcon from '@coreui/icons-react'
+import { cilLockLocked } from '@coreui/icons'
+import { useNavigate } from 'react-router-dom'
 
 const Unauthorized = () => {
   const navigate = useNavigate()
@@ -12,19 +14,18 @@ const Unauthorized = () => {
   }
 
   return (
-    <div className="bg-body-tertiary min-vh-100 d-flex flex-row align-items-center">
+    <div className="min-vh-100 d-flex flex-column align-items-center justify-content-center bg-body-tertiary text-center">
       <CContainer>
         <CRow className="justify-content-center">
-          <CCol md={6}>
-            <div className="clearfix">
-              <h1 className="float-start display-3 me-4">403</h1>
-              <h4 className="pt-3">Unauthorized</h4>
-              <p className="text-medium-emphasis float-start">
-                You do not have permission to view this page.
-              </p>
-            </div>
+          <CCol md={8} className="d-flex align-items-center justify-content-center">
+            <CIcon icon={cilLockLocked} size="5xl" className="text-danger me-3" />
+            <h1 className="display-1 fw-bold text-danger">403</h1>
+          </CCol>
+          <CCol md={8}>
+            <h4 className="text-white fw-semibold">Akses Ditolak</h4>
+            <p className="text-muted">Anda tidak memiliki izin untuk mengakses halaman ini.</p>
             <CButton color="primary" onClick={handleLogout}>
-              Go to Home
+              Kembali ke Login
             </CButton>
           </CCol>
         </CRow>
