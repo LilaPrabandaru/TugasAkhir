@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import {
   CCard,
   CCardHeader,
@@ -28,17 +28,17 @@ const Menu = () => {
   const [menuToDelete, setMenuToDelete] = useState(null)
 
   useEffect(() => {
-    const fetchMenuData = async () => {
-      try {
-        const data = await getMenu()
-        console.log('Fetched menu data:', data)
-        setMenuData(data)
-      } catch (error) {
-        console.error('Failed to fetch menu data:', error)
-      }
-    }
-
     fetchMenuData()
+  }, [])
+
+  const fetchMenuData = useCallback(async () => {
+    try {
+      const data = await getMenu()
+      console.log('Fetched menu data:', data)
+      setMenuData(data)
+    } catch (error) {
+      console.error('Failed to fetch menu data:', error)
+    }
   }, [])
 
   const handleAddMenu = async () => {
@@ -47,11 +47,10 @@ const Menu = () => {
       return
     }
     try {
-      const addedMenu = await addMenu(newMenu)
-      setMenuData([...menuData, addedMenu])
+      await addMenu(newMenu)
+      fetchMenuData() // --> menggantikan fungsi reload
       setNewMenu({ Nama: '', Harga: '', Tipe: '', Kategori: '' })
       setModalVisible(false)
-      window.location.reload()
     } catch (error) {
       console.error('Failed to add menu:', error)
     }
@@ -69,10 +68,9 @@ const Menu = () => {
     }
 
     try {
-      const updatedMenu = await updateMenu(currentMenu._id, newMenu)
-      setMenuData(menuData.map((menu) => (menu._id === currentMenu._id ? updatedMenu : menu)))
+      await updateMenu(currentMenu._id, newMenu)
+      fetchMenuData()
       setUpdateModalVisible(false)
-      window.location.reload() // Refresh halaman setelah mengupdate menu
     } catch (error) {
       console.error('Failed to update menu:', error.response ? error.response.data : error.message)
     }
@@ -81,7 +79,7 @@ const Menu = () => {
   const handleDeleteMenu = async () => {
     try {
       await deleteMenu(menuToDelete)
-      setMenuData(menuData.filter((menu) => menu._id !== menuToDelete))
+      fetchMenuData()
       setConfirmDeleteVisible(false)
     } catch (error) {
       console.error('Failed to delete menu:', error)
