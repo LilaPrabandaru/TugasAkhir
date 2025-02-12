@@ -88,6 +88,17 @@ const Karyawan = () => {
     setModal(true)
   }
 
+  const formatDate = (dateStr) => {
+    if (!dateStr) return ''
+    const date = new Date(dateStr)
+    return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })
+  }
+
+  const parseDate = (dateStr) => {
+    const [year, month, day] = dateStr.split('-')
+    return `${year}-${month}-${day}`
+  }
+
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
@@ -114,7 +125,7 @@ const Karyawan = () => {
                   <CTableDataCell>{karyawan.Email}</CTableDataCell>
                   <CTableDataCell>{karyawan.Nama_Lengkap}</CTableDataCell>
                   <CTableDataCell>{karyawan.Nomor_Telp}</CTableDataCell>
-                  <CTableDataCell>{karyawan.Tanggal_Lahir}</CTableDataCell>
+                  <CTableDataCell>{formatDate(karyawan.Tanggal_Lahir)}</CTableDataCell>
                   <CTableDataCell>
                     <CButton color="warning" onClick={() => openModal(karyawan)}>
                       <CIcon icon={cilPencil} />
@@ -152,8 +163,9 @@ const Karyawan = () => {
               onChange={(e) => setFormData({ ...formData, Nomor_Telp: e.target.value })}
             />
             <CFormInput
+              type="date"
               label="Tanggal Lahir"
-              value={formData.Tanggal_Lahir}
+              value={parseDate(formData.Tanggal_Lahir)}
               onChange={(e) => setFormData({ ...formData, Tanggal_Lahir: e.target.value })}
             />
           </CForm>

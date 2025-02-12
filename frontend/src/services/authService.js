@@ -1,9 +1,11 @@
 import axios from 'axios'
 import config from '../config'
 
+const API_URL = `${config.API_URL}`
+
 export const login = async (email, password) => {
   try {
-    const response = await axios.post(`${config.API_URL}/login`, { email, password })
+    const response = await axios.post(`${API_URL}/login`, { email, password })
     return response.data
   } catch (error) {
     console.error('Error logging in:', error)
