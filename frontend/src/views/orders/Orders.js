@@ -97,67 +97,53 @@ const Orders = () => {
 
   return (
     <div>
-      <CButton
-        color="primary"
-        className="mb-3"
-        onClick={() => {
-          setEditMode(false)
-          setFormData({ Nama_Pelanggan: '', Tanggal: '', Waktu: '', Detail: [] })
-          setModalOpen(true)
-        }}
-      >
-        Tambah Pesanan
-      </CButton>
-
-      <CRow>
-        {pesananList.map((pesanan) => (
-          <CCard className="mb-3">
-            <CCardHeader>
-              <p>Nama Pelanggan: {pesanan.Nama_Pelanggan}</p>
-              <p>Tanggal: {pesanan.Tanggal}</p>
-              <p>Waktu: {pesanan.Waktu}</p>
-            </CCardHeader>
-            <CCardBody>
-              <CAccordion className="mb-4 mt-2">
-                <CAccordionItem>
-                  <CAccordionHeader>Detail Pesanan</CAccordionHeader>
-                  <CAccordionBody>
-                    <CTable bordered>
-                      <CTableHead>
-                        <CTableRow>
-                          <CTableHeaderCell>Nama Menu</CTableHeaderCell>
-                          <CTableHeaderCell className="text-end">Harga</CTableHeaderCell>
-                          <CTableHeaderCell className="text-center">Jumlah</CTableHeaderCell>
+      {pesananList.map((pesanan) => (
+        <CCard className="mb-3">
+          <CCardHeader>
+            <p>Nama Pelanggan: {pesanan.Nama_Pelanggan}</p>
+            <p>Tanggal: {pesanan.Tanggal}</p>
+            <p>Waktu: {pesanan.Waktu}</p>
+          </CCardHeader>
+          <CCardBody>
+            <CAccordion className="mb-4 mt-2">
+              <CAccordionItem>
+                <CAccordionHeader>Detail Pesanan</CAccordionHeader>
+                <CAccordionBody>
+                  <CTable bordered>
+                    <CTableHead>
+                      <CTableRow>
+                        <CTableHeaderCell>Nama Menu</CTableHeaderCell>
+                        <CTableHeaderCell className="text-end">Harga</CTableHeaderCell>
+                        <CTableHeaderCell className="text-center">Jumlah</CTableHeaderCell>
+                      </CTableRow>
+                    </CTableHead>
+                    <CTableBody>
+                      {pesanan.Detail.map((item, index) => (
+                        <CTableRow key={index}>
+                          <CTableDataCell>{item['Nama Menu']}</CTableDataCell>
+                          <CTableDataCell className="text-end">
+                            {item.Harga.toLocaleString()}
+                          </CTableDataCell>
+                          <CTableDataCell className="text-center">{item.Jumlah}</CTableDataCell>
                         </CTableRow>
-                      </CTableHead>
-                      <CTableBody>
-                        {pesanan.Detail.map((item, index) => (
-                          <CTableRow key={index}>
-                            <CTableDataCell>{item['Nama Menu']}</CTableDataCell>
-                            <CTableDataCell className="text-end">
-                              {item.Harga.toLocaleString()}
-                            </CTableDataCell>
-                            <CTableDataCell className="text-center">{item.Jumlah}</CTableDataCell>
-                          </CTableRow>
-                        ))}
-                      </CTableBody>
-                    </CTable>
-                    <h6 className="mt-3">
-                      Total Harga: Rp {pesanan['total harga'].toLocaleString()}
-                    </h6>
-                  </CAccordionBody>
-                </CAccordionItem>
-              </CAccordion>
-              <CButton color="warning" className="me-2" onClick={() => handleEdit(pesanan)}>
-                <CIcon icon={cilPencil} />
-              </CButton>
-              <CButton color="danger" onClick={() => handleDelete(pesanan._id)}>
-                <CIcon icon={cilTrash} />
-              </CButton>
-            </CCardBody>
-          </CCard>
-        ))}
-      </CRow>
+                      ))}
+                    </CTableBody>
+                  </CTable>
+                  <h6 className="mt-3">
+                    Total Harga: Rp {pesanan['total harga'].toLocaleString()}
+                  </h6>
+                </CAccordionBody>
+              </CAccordionItem>
+            </CAccordion>
+            <CButton color="warning" className="me-2" onClick={() => handleEdit(pesanan)}>
+              <CIcon icon={cilPencil} />
+            </CButton>
+            <CButton color="danger" onClick={() => handleDelete(pesanan._id)}>
+              <CIcon icon={cilTrash} />
+            </CButton>
+          </CCardBody>
+        </CCard>
+      ))}
 
       <CModal visible={modalOpen} onClose={() => setModalOpen(false)}>
         <CModalHeader>
