@@ -48,7 +48,7 @@ const Menu = () => {
     }
     try {
       await addMenu(newMenu)
-      fetchMenuData() // --> menggantikan fungsi reload
+      fetchMenuData()
       setNewMenu({ Nama: '', Harga: '', Tipe: '', Kategori: '' })
       setModalVisible(false)
     } catch (error) {
