@@ -17,7 +17,7 @@ const Page500 = React.lazy(() => import('./views/pages/page500/Page500'))
 const Unauthorized = React.lazy(() => import('./views/pages/unauthorized/Unauthorized'))
 
 // Komponen untuk menangani error global (Halaman 500)
-class ErrorBoundary extends React.Component {
+class ErrorBoundary extends React.Component { //TEST UPLOAD GITHUB
   constructor(props) {
     super(props)
     this.state = { hasError: false }
