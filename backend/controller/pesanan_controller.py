@@ -63,7 +63,6 @@ class GetPesananByTanggal(Resource):
 class AddPesanan(Resource):
     def post(self):
         args = parser.parse_args()
-        args = parser.parse_args()
         data = {
                 'Nama_Pelanggan': args['Nama_Pelanggan'],
                 'Tanggal': args['Tanggal'],
