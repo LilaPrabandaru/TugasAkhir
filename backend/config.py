@@ -21,7 +21,7 @@ JWT_SECRET_KEY = get_jwt_secret_key()
 BLACKLIST = set()
 
 # Token Expiration (dalam detik)
-JWT_ACCESS_TOKEN_EXPIRES = 3600  # 1 jam
+JWT_ACCESS_TOKEN_EXPIRES = 28.800  # 8 jam
 JWT_REFRESH_TOKEN_EXPIRES = 24 * 3600  # 1 hari
 JWT_BLACKLIST_ENABLED = True
 JWT_BLACKLIST_TOKEN_CHECKS = ['access', 'refresh']
