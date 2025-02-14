@@ -9,8 +9,6 @@ import {
   CTableHeaderCell,
   CTableBody,
   CTableDataCell,
-  CCol,
-  CRow,
   CButton,
   CForm,
   CFormLabel,
@@ -24,6 +22,8 @@ import {
   CAccordionItem,
   CAccordionHeader,
   CAccordionBody,
+  CPagination,
+  CPaginationItem,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilPencil, cilTrash } from '@coreui/icons'
@@ -40,6 +40,11 @@ const Orders = () => {
   })
   const [editMode, setEditMode] = useState(false)
   const [selectedPesananId, setSelectedPesananId] = useState(null)
+  const [confirmDeleteVisible, setConfirmDeleteVisible] = useState(false)
+  const [pesananToDelete, setPesananToDelete] = useState(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [selectedDate, setSelectedDate] = useState('')
+  const itemsPerPage = 5
 
   useEffect(() => {
     fetchPesanan()
@@ -58,6 +63,10 @@ const Orders = () => {
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData({ ...formData, [name]: value })
+  }
+
+  const handleDateChange = (e) => {
+    setSelectedDate(e.target.value)
   }
 
   const handleSubmit = async (e) => {
@@ -84,21 +93,47 @@ const Orders = () => {
     setModalOpen(true)
   }
 
-  const handleDelete = async (pesananId) => {
-    if (window.confirm('Yakin ingin menghapus pesanan ini?')) {
-      try {
-        await deletePesanan(pesananId)
-        fetchPesanan()
-      } catch (error) {
-        console.error('Error deleting pesanan:', error)
-      }
+  const handleDelete = (pesananId) => {
+    setPesananToDelete(pesananId)
+    setConfirmDeleteVisible(true)
+  }
+
+  const confirmDelete = async () => {
+    try {
+      await deletePesanan(pesananToDelete)
+      fetchPesanan()
+      setConfirmDeleteVisible(false)
+      setPesananToDelete(null)
+    } catch (error) {
+      console.error('Error deleting pesanan:', error)
     }
   }
 
+  const handlePageChange = (page) => {
+    setCurrentPage(page)
+  }
+
+  const indexOfLastItem = currentPage * itemsPerPage
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage
+
+  const filteredPesananList = selectedDate
+    ? pesananList.filter((pesanan) => pesanan.Tanggal === selectedDate)
+    : pesananList
+
+  const currentItems = filteredPesananList.slice(indexOfFirstItem, indexOfLastItem)
+
   return (
     <div>
-      {pesananList.map((pesanan) => (
-        <CCard className="mb-3">
+      <div className="d-flex justify-content-center mb-4">
+        <CFormInput
+          type="date"
+          value={selectedDate}
+          onChange={handleDateChange}
+          placeholder="Filter by date"
+        />
+      </div>
+      {currentItems.map((pesanan) => (
+        <CCard className="mb-3" key={pesanan._id}>
           <CCardHeader>
             <p>Nama Pelanggan: {pesanan.Nama_Pelanggan}</p>
             <p>Tanggal: {pesanan.Tanggal}</p>
@@ -113,25 +148,31 @@ const Orders = () => {
                     <CTableHead>
                       <CTableRow>
                         <CTableHeaderCell>Nama Menu</CTableHeaderCell>
-                        <CTableHeaderCell className="text-end">Harga</CTableHeaderCell>
                         <CTableHeaderCell className="text-center">Jumlah</CTableHeaderCell>
+                        <CTableHeaderCell className="text-end">Harga</CTableHeaderCell>
                       </CTableRow>
                     </CTableHead>
                     <CTableBody>
                       {pesanan.Detail.map((item, index) => (
                         <CTableRow key={index}>
                           <CTableDataCell>{item['Nama Menu']}</CTableDataCell>
+                          <CTableDataCell className="text-center">{item.Jumlah}</CTableDataCell>
                           <CTableDataCell className="text-end">
                             {item.Harga.toLocaleString()}
                           </CTableDataCell>
-                          <CTableDataCell className="text-center">{item.Jumlah}</CTableDataCell>
                         </CTableRow>
                       ))}
+                      <CTableRow>
+                        <CTableDataCell></CTableDataCell>
+                        <CTableDataCell className="text-center">
+                          <h6>Total Harga:</h6>
+                        </CTableDataCell>
+                        <CTableDataCell className="text-end">
+                          <h6>Rp {pesanan['total harga'].toLocaleString()}</h6>
+                        </CTableDataCell>
+                      </CTableRow>
                     </CTableBody>
                   </CTable>
-                  <h6 className="mt-3">
-                    Total Harga: Rp {pesanan['total harga'].toLocaleString()}
-                  </h6>
                 </CAccordionBody>
               </CAccordionItem>
             </CAccordion>
@@ -144,6 +185,30 @@ const Orders = () => {
           </CCardBody>
         </CCard>
       ))}
+
+      <CPagination align="center" className="mt-4">
+        <CPaginationItem
+          disabled={currentPage === 1}
+          onClick={() => handlePageChange(currentPage - 1)}
+        >
+          Previous
+        </CPaginationItem>
+        {[...Array(Math.ceil(filteredPesananList.length / itemsPerPage)).keys()].map((number) => (
+          <CPaginationItem
+            key={number + 1}
+            active={currentPage === number + 1}
+            onClick={() => handlePageChange(number + 1)}
+          >
+            {number + 1}
+          </CPaginationItem>
+        ))}
+        <CPaginationItem
+          disabled={currentPage === Math.ceil(filteredPesananList.length / itemsPerPage)}
+          onClick={() => handlePageChange(currentPage + 1)}
+        >
+          Next
+        </CPaginationItem>
+      </CPagination>
 
       <CModal visible={modalOpen} onClose={() => setModalOpen(false)}>
         <CModalHeader>
@@ -173,6 +238,23 @@ const Orders = () => {
             </CModalFooter>
           </CForm>
         </CModalBody>
+      </CModal>
+
+      <CModal visible={confirmDeleteVisible} onClose={() => setConfirmDeleteVisible(false)}>
+        <CModalHeader>
+          <CModalTitle>Konfirmasi Hapus</CModalTitle>
+        </CModalHeader>
+        <CModalBody>
+          <p>Apakah Anda yakin ingin menghapus pesanan ini?</p>
+        </CModalBody>
+        <CModalFooter>
+          <CButton color="secondary" onClick={() => setConfirmDeleteVisible(false)}>
+            Batal
+          </CButton>
+          <CButton color="danger" onClick={confirmDelete}>
+            Hapus
+          </CButton>
+        </CModalFooter>
       </CModal>
     </div>
   )
