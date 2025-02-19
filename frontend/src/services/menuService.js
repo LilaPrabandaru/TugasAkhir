@@ -4,6 +4,7 @@ import config from '../config'
 const access_token = sessionStorage.getItem('access_token')
 const API_URL = `${config.API_URL}`
 
+// Ambil semua menu
 export const getMenu = async () => {
   try {
     const response = await axios.get(`${API_URL}/menu`, {
@@ -18,6 +19,7 @@ export const getMenu = async () => {
   }
 }
 
+// Tambah menu
 export const addMenu = async (menuData) => {
   try {
     const response = await axios.post(`${API_URL}/add_menu`, menuData, {
@@ -32,6 +34,7 @@ export const addMenu = async (menuData) => {
   }
 }
 
+// Update menu
 export const updateMenu = async (menuId, menuData) => {
   try {
     const response = await axios.post(`${API_URL}/update_menu/${menuId}`, menuData, {
@@ -46,6 +49,7 @@ export const updateMenu = async (menuId, menuData) => {
   }
 }
 
+// Hapus menu
 export const deleteMenu = async (menuId) => {
   try {
     const response = await axios.delete(`${API_URL}/delete_menu/${menuId}`, {

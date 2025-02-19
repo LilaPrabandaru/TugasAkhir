@@ -1,9 +1,10 @@
 import axios from 'axios'
 import config from '../config'
 
-const access_token = sessionStorage.getItem('access_token')
 const API_URL = `${config.API_URL}`
+const access_token = sessionStorage.getItem('access_token')
 
+// Ambil semua karyawan
 export const getKaryawan = async () => {
   try {
     const response = await axios.get(`${API_URL}/karyawan`, {
@@ -18,6 +19,7 @@ export const getKaryawan = async () => {
   }
 }
 
+// Tambah karyawan
 export const addKaryawan = async (karyawan) => {
   try {
     const response = await axios.post(`${API_URL}/add_karyawan`, karyawan, {
@@ -32,9 +34,10 @@ export const addKaryawan = async (karyawan) => {
   }
 }
 
-export const updateKaryawan = async (id, karyawan) => {
+// Update karyawan
+export const updateKaryawan = async (karyawanId, karyawan) => {
   try {
-    const response = await axios.post(`${API_URL}/update_karyawan/${id}`, karyawan, {
+    const response = await axios.post(`${API_URL}/update_karyawan/${karyawanId}`, karyawan, {
       headers: {
         Authorization: `Bearer ${access_token}`,
       },
@@ -46,9 +49,10 @@ export const updateKaryawan = async (id, karyawan) => {
   }
 }
 
-export const deleteKaryawan = async (id) => {
+// Hapus karyawan
+export const deleteKaryawan = async (karyawanId) => {
   try {
-    await axios.delete(`${API_URL}/delete_karyawan/${id}`, {
+    await axios.delete(`${API_URL}/delete_karyawan/${karyawanId}`, {
       headers: {
         Authorization: `Bearer ${access_token}`,
       },
