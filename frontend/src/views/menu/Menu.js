@@ -5,6 +5,7 @@ import {
   CCardBody,
   CButton,
   CModal,
+  CModalTitle,
   CModalHeader,
   CModalBody,
   CModalFooter,
@@ -194,7 +195,7 @@ const Menu = () => {
         <CModalBody>
           {updateAlertVisible && (
             <CAlert color="warning" onClose={() => setUpdateAlertVisible(false)}>
-              Tidak Ada Yang Di Update
+              Tidak Ada Menu Yang Di Update
             </CAlert>
           )}
           <CFormInput
@@ -247,9 +248,14 @@ const Menu = () => {
           </CButton>
         </CModalFooter>
       </CModal>
+
       <CModal visible={confirmDeleteVisible} onClose={handleCloseConfirmDeleteModal}>
-        <CModalHeader onClose={handleCloseConfirmDeleteModal}>Konfirmasi Hapus</CModalHeader>
-        <CModalBody>Apakah Anda yakin ingin menghapus menu ini?</CModalBody>
+        <CModalHeader onClose={handleCloseConfirmDeleteModal}>
+          <CModalTitle>Konfirmasi Hapus</CModalTitle>
+        </CModalHeader>
+        <CModalBody>
+          <p>Apakah Anda yakin ingin menghapus menu ini?</p>
+        </CModalBody>
         <CModalFooter>
           <CButton color="secondary" onClick={handleCloseConfirmDeleteModal}>
             Batal

@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react'
+import DatePicker from 'react-datepicker'
+import 'react-datepicker/dist/react-datepicker.css'
 import {
   CTable,
   CTableHead,
@@ -17,6 +19,7 @@ import {
   CCard,
   CCardHeader,
   CCardBody,
+  CAlert,
 } from '@coreui/react'
 import {
   getKaryawan,
@@ -26,6 +29,17 @@ import {
 } from 'src/services/karyawanService'
 import CIcon from '@coreui/icons-react'
 import { cilPencil, cilTrash } from '@coreui/icons'
+
+// Komponen custom untuk input datepicker dengan menggunakan CFormInput
+const CustomDateInput = React.forwardRef(({ value, onClick, onChange, placeholder }, ref) => (
+  <CFormInput
+    value={value}
+    onClick={onClick}
+    onChange={onChange}
+    placeholder={placeholder}
+    ref={ref}
+  />
+))
 
 const Karyawan = () => {
   const [karyawanList, setKaryawanList] = useState([])
@@ -94,9 +108,8 @@ const Karyawan = () => {
     return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })
   }
 
-  const parseDate = (dateStr) => {
-    const [year, month, day] = dateStr.split('-')
-    return `${year}-${month}-${day}`
+  const clearDate = () => {
+    setFormData({ ...formData, Tanggal_Lahir: '' })
   }
 
   return (
@@ -143,7 +156,7 @@ const Karyawan = () => {
 
       <CModal visible={modal} onClose={() => setModal(false)}>
         <CModalHeader>
-          <CModalTitle>{selectedKaryawan ? 'Edit Karyawan' : 'Tambah Karyawan'}</CModalTitle>
+          <CModalTitle>{selectedKaryawan ? 'Update Karyawan' : 'Tambah Karyawan'}</CModalTitle>
         </CModalHeader>
         <CModalBody>
           <CForm>
@@ -162,12 +175,24 @@ const Karyawan = () => {
               value={formData.Nomor_Telp}
               onChange={(e) => setFormData({ ...formData, Nomor_Telp: e.target.value })}
             />
-            <CFormInput
-              type="date"
-              label="Tanggal Lahir"
-              value={parseDate(formData.Tanggal_Lahir)}
-              onChange={(e) => setFormData({ ...formData, Tanggal_Lahir: e.target.value })}
-            />
+            <label className="form-label">Tanggal Lahir</label>
+            <div className="d-flex align-items-center">
+              {/* DatePicker dengan custom input CFormInput */}
+              <DatePicker
+                selected={formData.Tanggal_Lahir ? new Date(formData.Tanggal_Lahir) : null}
+                onChange={(date) =>
+                  setFormData({
+                    ...formData,
+                    Tanggal_Lahir: date ? date.toISOString().split('T')[0] : '',
+                  })
+                }
+                dateFormat="yyyy-MM-dd"
+                customInput={<CustomDateInput />}
+              />
+              <CButton color="secondary" size="sm" className="ms-2" onClick={clearDate}>
+                Clear
+              </CButton>
+            </div>
           </CForm>
         </CModalBody>
         <CModalFooter>

@@ -1,17 +1,10 @@
-import argparse
 from flask_restful import Resource, reqparse
 from model.pesanan import Pesanan
 from model.menu import Menu
-from datetime import date, time, datetime
+from datetime import datetime
 
 pesanan_model = Pesanan()
 parser = reqparse.RequestParser()
-
-# def parse_tanggal(tanggal_string):
-#     try:
-#         return datetime.strptime(tanggal_string, '%d-%m-%Y').date()
-#     except ValueError:
-#         raise argparse.ArgumentTypeError("Format tanggal harus YYYY-MM-DD")
 
 parser.add_argument('Nama_Pelanggan', 
                     type=str, 
@@ -33,6 +26,11 @@ parser.add_argument('Detail',
                     action='append',
                     required=False
                     )
+parser.add_argument('Status',
+                    type=str,
+                    required=False,
+                    default='Pending',
+                    help="Parameter 'Status' tidak boleh kosong")
 
 class GetAllPesanan(Resource):
     def get(self):
@@ -63,16 +61,17 @@ class GetPesananByTanggal(Resource):
 class AddPesanan(Resource):
     def post(self):
         args = parser.parse_args()
+        status = args['Status'] if args['Status'] else 'Pending'
         data = {
                 'Nama_Pelanggan': args['Nama_Pelanggan'],
                 'Tanggal': args['Tanggal'],
                 'Waktu': args['Waktu'],
-                'Detail':[]
+                'Detail': [],
+                'Status': status
                 }
         
         temp = 0
         for menu in args['Detail']:
-            # print(menu['Id Menu'])
             detailMenu = Menu().findMenu(menu_id=menu["Id Menu"])
             detail = {
                 'Nama Menu': detailMenu['data']['Nama'],
@@ -82,7 +81,6 @@ class AddPesanan(Resource):
             data['Detail'].append(detail)
             temp += detailMenu['data']['Harga'] * menu['Jumlah']
         data['total harga']= temp
-        # print(data)
         result = pesanan_model.insertPesanan(data)
         if result['status']:
             return({'message': 'Order Added Successfully'}), 200

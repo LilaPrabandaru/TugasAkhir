@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react'
+import DatePicker from 'react-datepicker'
+import 'react-datepicker/dist/react-datepicker.css'
 import {
   CCard,
   CCardBody,
@@ -37,13 +39,14 @@ const Orders = () => {
     Tanggal: '',
     Waktu: '',
     Detail: [],
+    Status: '',
   })
   const [editMode, setEditMode] = useState(false)
   const [selectedPesananId, setSelectedPesananId] = useState(null)
   const [confirmDeleteVisible, setConfirmDeleteVisible] = useState(false)
   const [pesananToDelete, setPesananToDelete] = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
-  const [selectedDate, setSelectedDate] = useState('')
+  const [selectedDate, setSelectedDate] = useState(null)
   const itemsPerPage = 5
 
   useEffect(() => {
@@ -65,8 +68,12 @@ const Orders = () => {
     setFormData({ ...formData, [name]: value })
   }
 
-  const handleDateChange = (e) => {
-    setSelectedDate(e.target.value)
+  const handleDateChange = (date) => {
+    setSelectedDate(date)
+  }
+
+  const handleClearDate = () => {
+    setSelectedDate(null)
   }
 
   const handleSubmit = async (e) => {
@@ -117,7 +124,14 @@ const Orders = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage
 
   const filteredPesananList = selectedDate
-    ? pesananList.filter((pesanan) => pesanan.Tanggal === selectedDate)
+    ? pesananList.filter((pesanan) => {
+        const pesananDate = new Date(pesanan.Tanggal)
+        return (
+          pesananDate.getFullYear() === selectedDate.getFullYear() &&
+          pesananDate.getMonth() === selectedDate.getMonth() &&
+          pesananDate.getDate() === selectedDate.getDate()
+        )
+      })
     : pesananList
 
   const currentItems = filteredPesananList.slice(indexOfFirstItem, indexOfLastItem)
@@ -125,12 +139,17 @@ const Orders = () => {
   return (
     <div>
       <div className="d-flex justify-content-center mb-4">
-        <CFormInput
-          type="date"
-          value={selectedDate}
+        <DatePicker
+          selected={selectedDate}
           onChange={handleDateChange}
-          placeholder="Filter by date"
+          placeholderText="Filter Tanggal"
+          dateFormat="yyyy-MM-dd"
+          className="form-control"
+          minDate={new Date()}
         />
+        <CButton color="secondary" onClick={handleClearDate} className="ms-2">
+          Clear
+        </CButton>
       </div>
       {currentItems.map((pesanan) => (
         <CCard className="mb-3" key={pesanan._id}>
@@ -138,6 +157,9 @@ const Orders = () => {
             <p>Nama Pelanggan: {pesanan.Nama_Pelanggan}</p>
             <p>Tanggal: {pesanan.Tanggal}</p>
             <p>Waktu: {pesanan.Waktu}</p>
+            <p style={{ color: pesanan.Status === 'Pending' ? 'red' : 'green' }}>
+              Status: {pesanan.Status}
+            </p>
           </CCardHeader>
           <CCardBody>
             <CAccordion className="mb-4 mt-2">

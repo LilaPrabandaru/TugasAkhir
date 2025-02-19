@@ -1,7 +1,5 @@
 from model import Database
-from bson import ObjectId
 from config import MONGO_DB, MONGO_PESANAN_COLLECTION
-from datetime import date, time, datetime
 import random
 import string
 
@@ -35,8 +33,6 @@ class Pesanan:
         result = {'status': False, 'data': None, 'message': ''}
         status, data = self.connection.findMany(collection_name=MONGO_PESANAN_COLLECTION, filter={})
 
-        print(f"Data dari findMany: {data}")  # Debugging
-
         result['status'] = status
         result['data'] = data
 
@@ -51,8 +47,6 @@ class Pesanan:
             result['status'] = True
             result['message'] = 'Successfully Retrieved Order Data'
         return result
-
-
     
     def findPesananTanggal(self, tanggal):
         result = {'status': False, 'data': None, 'message': ''}
@@ -70,12 +64,6 @@ class Pesanan:
 
     def insertPesanan(self, data):
         result = {'status': False, 'data': None, 'message': ''}
-
-        # if isinstance(data['Tanggal'], date):
-        #     data['Tanggal'] = data['Tanggal'].strftime('%d-%m-%Y')
-
-        # if isinstance(data['Waktu'], time):
-        #     data['Waktu'] = data['Waktu'].strftime('%H:%M:%S')
 
         data['_id'] = self.generatedId()
         statusInsert, dataInsert = self.connection.insert(collection_name=MONGO_PESANAN_COLLECTION, value=data)
