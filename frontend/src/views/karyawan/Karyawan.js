@@ -42,17 +42,19 @@ const CustomDateInput = React.forwardRef(({ value, onClick, onChange, placeholde
 ))
 
 const Karyawan = () => {
-  const [karyawanList, setKaryawanList] = useState([])
+  const [karyawanData, setkaryawanData] = useState([])
   const [modal, setModal] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [selectedKaryawan, setSelectedKaryawan] = useState(null)
   const [deleteId, setDeleteId] = useState(null)
-  const [formData, setFormData] = useState({
+  const [newKaryawan, setnewKaryawan] = useState({
     Email: '',
     Nama_Lengkap: '',
     Nomor_Telp: '',
     Tanggal_Lahir: '',
   })
+  const [showModalAlert, setShowModalAlert] = useState(false) // State untuk alert di modal
+  const [modalAlertMessage, setModalAlertMessage] = useState('') // Pesan alert di modal
 
   useEffect(() => {
     fetchData()
@@ -61,27 +63,63 @@ const Karyawan = () => {
   const fetchData = async () => {
     try {
       const data = await getKaryawan()
-      setKaryawanList(data)
+      setkaryawanData(data)
     } catch (error) {
       console.error('Error fetching karyawan:', error)
     }
   }
 
-  const handleSave = async () => {
+  const handleUpdateMenu = async () => {
+    // Validasi: pastikan semua field terisi
+    if (
+      !newKaryawan.Email.trim() ||
+      !newKaryawan.Nama_Lengkap.trim() ||
+      !newKaryawan.Nomor_Telp.trim() ||
+      !newKaryawan.Tanggal_Lahir.trim()
+    ) {
+      setModalAlertMessage('Semua Kolom Harus Di Isi')
+      setShowModalAlert(true)
+      return
+    }
+
     try {
       if (selectedKaryawan) {
-        await updateKaryawan(selectedKaryawan._id, formData)
+        // Bandingkan data lama dengan data baru
+        const isSame =
+          selectedKaryawan.Email === newKaryawan.Email &&
+          selectedKaryawan.Nama_Lengkap === newKaryawan.Nama_Lengkap &&
+          selectedKaryawan.Nomor_Telp === newKaryawan.Nomor_Telp &&
+          selectedKaryawan.Tanggal_Lahir === newKaryawan.Tanggal_Lahir
+
+        if (isSame) {
+          setModalAlertMessage('Tidak Ada Karyawan Yang Di Update')
+          setShowModalAlert(true)
+          return
+        }
+        await updateKaryawan(selectedKaryawan._id, newKaryawan)
       } else {
-        await addKaryawan(formData)
+        await addKaryawan(newKaryawan)
       }
       fetchData()
-      setModal(false)
+      handleCloseUpdateModal()
     } catch (error) {
       console.error('Error saving karyawan:', error)
     }
   }
 
-  const handleDelete = async () => {
+  const handleCloseUpdateModal = () => {
+    setModal(false)
+    setShowModalAlert(false)
+    setSelectedKaryawan(null)
+    setnewKaryawan({
+      Email: '',
+      Nama_Lengkap: '',
+      Nomor_Telp: '',
+      Tanggal_Lahir: '',
+    })
+  }
+
+  const handleDeleteKaryawan = async () => {
     try {
       await deleteKaryawan(deleteId)
       fetchData()
@@ -91,14 +129,14 @@ const Karyawan = () => {
     }
   }
 
-  const openDeleteModal = (_id) => {
+  const handleOpenDeleteModal = (_id) => {
     setDeleteId(_id)
     setConfirmDelete(true)
   }
 
-  const openModal = (karyawan = null) => {
+  const handleOpenModal = (karyawan = null) => {
     setSelectedKaryawan(karyawan)
-    setFormData(karyawan || { Email: '', Nama_Lengkap: '', Nomor_Telp: '', Tanggal_Lahir: '' })
+    setnewKaryawan(karyawan || { Email: '', Nama_Lengkap: '', Nomor_Telp: '', Tanggal_Lahir: '' })
     setModal(true)
   }
 
@@ -108,14 +146,14 @@ const Karyawan = () => {
     return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })
   }
 
-  const clearDate = () => {
-    setFormData({ ...formData, Tanggal_Lahir: '' })
+  const handleClearDate = () => {
+    setnewKaryawan({ ...newKaryawan, Tanggal_Lahir: '' })
   }
 
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
-        <CButton color="primary" onClick={() => openModal()}>
+        <CButton color="primary" onClick={() => handleOpenModal()}>
           Tambah Karyawan
         </CButton>
       </div>
@@ -133,17 +171,17 @@ const Karyawan = () => {
               </CTableRow>
             </CTableHead>
             <CTableBody>
-              {karyawanList.map((karyawan) => (
+              {karyawanData.map((karyawan) => (
                 <CTableRow key={karyawan._id}>
                   <CTableDataCell>{karyawan.Email}</CTableDataCell>
                   <CTableDataCell>{karyawan.Nama_Lengkap}</CTableDataCell>
                   <CTableDataCell>{karyawan.Nomor_Telp}</CTableDataCell>
                   <CTableDataCell>{formatDate(karyawan.Tanggal_Lahir)}</CTableDataCell>
                   <CTableDataCell>
-                    <CButton color="warning" onClick={() => openModal(karyawan)}>
+                    <CButton color="warning" onClick={() => handleOpenModal(karyawan)}>
                       <CIcon icon={cilPencil} />
                     </CButton>{' '}
-                    <CButton color="danger" onClick={() => openDeleteModal(karyawan._id)}>
+                    <CButton color="danger" onClick={() => handleOpenDeleteModal(karyawan._id)}>
                       <CIcon icon={cilTrash} />
                     </CButton>
                   </CTableDataCell>
@@ -154,57 +192,64 @@ const Karyawan = () => {
         </CCardBody>
       </CCard>
 
-      <CModal visible={modal} onClose={() => setModal(false)}>
+      {/* Modal untuk Tambah/Update */}
+      <CModal visible={modal} onClose={handleCloseUpdateModal}>
         <CModalHeader>
           <CModalTitle>{selectedKaryawan ? 'Update Karyawan' : 'Tambah Karyawan'}</CModalTitle>
         </CModalHeader>
         <CModalBody>
+          {showModalAlert && (
+            <CAlert color="warning" onClose={() => setShowModalAlert(false)} dismissible>
+              {modalAlertMessage}
+            </CAlert>
+          )}
           <CForm>
             <CFormInput
               label="Email"
-              value={formData.Email}
-              onChange={(e) => setFormData({ ...formData, Email: e.target.value })}
+              value={newKaryawan.Email}
+              onChange={(e) => setnewKaryawan({ ...newKaryawan, Email: e.target.value })}
             />
             <CFormInput
               label="Nama Lengkap"
-              value={formData.Nama_Lengkap}
-              onChange={(e) => setFormData({ ...formData, Nama_Lengkap: e.target.value })}
+              value={newKaryawan.Nama_Lengkap}
+              onChange={(e) => setnewKaryawan({ ...newKaryawan, Nama_Lengkap: e.target.value })}
             />
             <CFormInput
               label="Nomor Telepon"
-              value={formData.Nomor_Telp}
-              onChange={(e) => setFormData({ ...formData, Nomor_Telp: e.target.value })}
+              value={newKaryawan.Nomor_Telp}
+              onChange={(e) => setnewKaryawan({ ...newKaryawan, Nomor_Telp: e.target.value })}
             />
             <label className="form-label">Tanggal Lahir</label>
             <div className="d-flex align-items-center">
               {/* DatePicker dengan custom input CFormInput */}
               <DatePicker
-                selected={formData.Tanggal_Lahir ? new Date(formData.Tanggal_Lahir) : null}
+                selected={newKaryawan.Tanggal_Lahir ? new Date(newKaryawan.Tanggal_Lahir) : null}
                 onChange={(date) =>
-                  setFormData({
-                    ...formData,
+                  setnewKaryawan({
+                    ...newKaryawan,
                     Tanggal_Lahir: date ? date.toISOString().split('T')[0] : '',
                   })
                 }
                 dateFormat="yyyy-MM-dd"
                 customInput={<CustomDateInput />}
               />
-              <CButton color="secondary" size="sm" className="ms-2" onClick={clearDate}>
+              <CButton color="secondary" size="sm" className="ms-2" onClick={handleClearDate}>
                 Clear
               </CButton>
             </div>
           </CForm>
         </CModalBody>
         <CModalFooter>
-          <CButton color="secondary" onClick={() => setModal(false)}>
+          <CButton color="secondary" onClick={handleCloseUpdateModal}>
             Batal
           </CButton>
-          <CButton color="primary" onClick={handleSave}>
-            Simpan
+          <CButton color="primary" onClick={handleUpdateMenu}>
+            {selectedKaryawan ? 'Update' : 'Tambah'}
           </CButton>
         </CModalFooter>
       </CModal>
 
+      {/* Modal Konfirmasi Hapus */}
       <CModal visible={confirmDelete} onClose={() => setConfirmDelete(false)}>
         <CModalHeader>
           <CModalTitle>Konfirmasi Hapus</CModalTitle>
@@ -214,7 +259,7 @@ const Karyawan = () => {
           <CButton color="secondary" onClick={() => setConfirmDelete(false)}>
             Batal
           </CButton>
-          <CButton color="danger" onClick={handleDelete}>
+          <CButton color="danger" onClick={handleDeleteKaryawan}>
             Hapus
           </CButton>
         </CModalFooter>

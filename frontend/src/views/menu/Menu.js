@@ -25,6 +25,7 @@ const Menu = () => {
   const [currentMenu, setCurrentMenu] = useState(null)
   const [alertVisible, setAlertVisible] = useState(false)
   const [updateAlertVisible, setUpdateAlertVisible] = useState(false)
+  const [updateAlertMessage, setUpdateAlertMessage] = useState('')
   const [confirmDeleteVisible, setConfirmDeleteVisible] = useState(false)
   const [menuToDelete, setMenuToDelete] = useState(null)
 
@@ -58,12 +59,20 @@ const Menu = () => {
   }
 
   const handleUpdateMenu = async () => {
+    // Periksa apakah semua field sudah terisi
+    if (!newMenu.Nama || !newMenu.Harga || !newMenu.Tipe || !newMenu.Kategori) {
+      setUpdateAlertMessage('Semua Kolom Harus Di Isi')
+      setUpdateAlertVisible(true)
+      return
+    }
+    // Jika tidak ada perubahan data
     if (
       currentMenu.Nama === newMenu.Nama &&
       currentMenu.Harga === newMenu.Harga &&
       currentMenu.Tipe === newMenu.Tipe &&
       currentMenu.Kategori === newMenu.Kategori
     ) {
+      setUpdateAlertMessage('Tidak Ada Menu Yang Di Update')
       setUpdateAlertVisible(true)
       return
     }
@@ -133,10 +142,12 @@ const Menu = () => {
         </CButton>
       </div>
       <CModal visible={modalVisible} onClose={handleCloseModal}>
-        <CModalHeader onClose={handleCloseModal}>Tambah Menu</CModalHeader>
+        <CModalHeader>
+          <CModalTitle onClose={handleCloseModal}>Tambah Menu</CModalTitle>
+        </CModalHeader>
         <CModalBody>
           {alertVisible && (
-            <CAlert color="danger" onClose={() => setAlertVisible(false)}>
+            <CAlert color="warning" onClose={() => setAlertVisible(false)}>
               Semua Kolom Harus Di Isi
             </CAlert>
           )}
@@ -191,11 +202,13 @@ const Menu = () => {
         </CModalFooter>
       </CModal>
       <CModal visible={updateModalVisible} onClose={handleCloseUpdateModal}>
-        <CModalHeader onClose={handleCloseUpdateModal}>Update Menu</CModalHeader>
+        <CModalHeader>
+          <CModalTitle onClose={handleCloseUpdateModal}>Update Menu</CModalTitle>
+        </CModalHeader>
         <CModalBody>
           {updateAlertVisible && (
             <CAlert color="warning" onClose={() => setUpdateAlertVisible(false)}>
-              Tidak Ada Menu Yang Di Update
+              {updateAlertMessage}
             </CAlert>
           )}
           <CFormInput

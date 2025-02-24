@@ -1,6 +1,6 @@
 import React from 'react'
 import CIcon from '@coreui/icons-react'
-import { cilSpeedometer, cilUser, cilClipboard, cilFastfood, cilAccountLogout } from '@coreui/icons'
+import { cilSpeedometer, cilUser, cilClipboard, cilFastfood, cilAccountLogout, cilHistory } from '@coreui/icons'
 import { CNavItem, CNavTitle } from '@coreui/react'
 
 // Ambil role dari sessionStorage
@@ -36,6 +36,12 @@ if (userRole === 'admin') {
       name: 'Karyawan',
       to: '/karyawan',
       icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
+    },
+    {
+      component: CNavItem,
+      name: 'Order History',
+      to: '/orderHistory',
+      icon: <CIcon icon={cilHistory} customClassName="nav-icon" />,
     },
   )
 }

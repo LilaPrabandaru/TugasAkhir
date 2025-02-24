@@ -26,10 +26,21 @@ import {
   CAccordionBody,
   CPagination,
   CPaginationItem,
+  CAlert, // Import CAlert
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilPencil, cilTrash } from '@coreui/icons'
 import { getAllPesanan, addPesanan, updatePesanan, deletePesanan } from 'src/services/orderService'
+
+const CustomDateInput = React.forwardRef(({ value, onClick, onChange, placeholder }, ref) => (
+  <CFormInput
+    value={value}
+    onClick={onClick}
+    onChange={onChange}
+    placeholder={placeholder}
+    ref={ref}
+  />
+))
 
 const Orders = () => {
   const [pesananList, setPesananList] = useState([])
@@ -47,6 +58,9 @@ const Orders = () => {
   const [pesananToDelete, setPesananToDelete] = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
   const [selectedDate, setSelectedDate] = useState(null)
+  const [showModalAlert, setShowModalAlert] = useState(false) // State untuk alert di modal
+  const [modalAlertMessage, setModalAlertMessage] = useState('') // Pesan alert di modal
+
   const itemsPerPage = 5
 
   useEffect(() => {
@@ -76,8 +90,27 @@ const Orders = () => {
     setSelectedDate(null)
   }
 
+  const handleClearDate2 = () => {
+    setFormData({ ...formData, Tanggal: '' })
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
+
+    const selectedPesanan = pesananList.find((pesanan) => pesanan._id === selectedPesananId)
+    const isSame =
+      selectedPesanan.Nama_Pelanggan === formData.Nama_Pelanggan &&
+      selectedPesanan.Tanggal === formData.Tanggal &&
+      selectedPesanan.Waktu === formData.Waktu &&
+      JSON.stringify(selectedPesanan.Detail) === JSON.stringify(formData.Detail) &&
+      selectedPesanan.Status === formData.Status
+
+    if (isSame) {
+      setModalAlertMessage('Tidak Ada Orders Yang Di Update')
+      setShowModalAlert(true)
+      return
+    }
+
     try {
       let newPesanan
       if (editMode) {
@@ -122,7 +155,6 @@ const Orders = () => {
 
   const indexOfLastItem = currentPage * itemsPerPage
   const indexOfFirstItem = indexOfLastItem - itemsPerPage
-
   const filteredPesananList = selectedDate
     ? pesananList.filter((pesanan) => {
         const pesananDate = new Date(pesanan.Tanggal)
@@ -133,8 +165,12 @@ const Orders = () => {
         )
       })
     : pesananList
-
   const currentItems = filteredPesananList.slice(indexOfFirstItem, indexOfLastItem)
+  const formatDate = (dateStr) => {
+    if (!dateStr) return ''
+    const date = new Date(dateStr)
+    return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })
+  }
 
   return (
     <div>
@@ -151,11 +187,12 @@ const Orders = () => {
           Clear
         </CButton>
       </div>
+
       {currentItems.map((pesanan) => (
         <CCard className="mb-3" key={pesanan._id}>
           <CCardHeader>
             <p>Nama Pelanggan: {pesanan.Nama_Pelanggan}</p>
-            <p>Tanggal: {pesanan.Tanggal}</p>
+            <p>Tanggal: {formatDate(pesanan.Tanggal)}</p>
             <p>Waktu: {pesanan.Waktu}</p>
             <p style={{ color: pesanan.Status === 'Pending' ? 'red' : 'green' }}>
               Status: {pesanan.Status}
@@ -232,11 +269,23 @@ const Orders = () => {
         </CPaginationItem>
       </CPagination>
 
-      <CModal visible={modalOpen} onClose={() => setModalOpen(false)}>
+      <CModal
+        visible={modalOpen}
+        onClose={() => {
+          setModalOpen(false)
+          setShowModalAlert(false) // Reset alert saat modal ditutup
+        }}
+      >
         <CModalHeader>
           <CModalTitle>{editMode ? 'Edit Pesanan' : 'Tambah Pesanan'}</CModalTitle>
         </CModalHeader>
         <CModalBody>
+          {/* Tampilkan alert di dalam modal */}
+          {showModalAlert && (
+            <CAlert color="warning" onClose={() => setShowModalAlert(false)} dismissible>
+              {modalAlertMessage}
+            </CAlert>
+          )}
           <CForm onSubmit={handleSubmit}>
             <CFormLabel>Nama Pelanggan</CFormLabel>
             <CFormInput
@@ -245,21 +294,40 @@ const Orders = () => {
               onChange={handleChange}
               required
             />
-            <CFormLabel>Tanggal</CFormLabel>
-            <CFormInput
-              type="date"
-              name="Tanggal"
-              value={formData.Tanggal}
-              onChange={handleChange}
-              required
-            />
-            <CModalFooter>
-              <CButton type="submit" color="primary">
-                {editMode ? 'Update' : 'Tambah'}
+            <label className="form-label">Tanggal</label>
+            <div className="d-flex align-items-center">
+              {/* DatePicker dengan custom input CFormInput */}
+              <DatePicker
+                selected={formData.Tanggal ? new Date(formData.Tanggal) : null}
+                onChange={(date) =>
+                  setFormData({
+                    ...formData,
+                    Tanggal: date ? date.toISOString().split('T')[0] : '',
+                  })
+                }
+                dateFormat="yyyy-MM-dd"
+                customInput={<CustomDateInput />}
+              />
+              <CButton color="secondary" size="sm" className="ms-2" onClick={handleClearDate2}>
+                Clear
               </CButton>
-            </CModalFooter>
+            </div>
           </CForm>
         </CModalBody>
+        <CModalFooter>
+          <CButton
+            color="secondary"
+            onClick={() => {
+              setModalOpen(false)
+              setShowModalAlert(false)
+            }}
+          >
+            Batal
+          </CButton>
+          <CButton type="submit" color="primary" onClick={handleSubmit}>
+            {editMode ? 'Update' : 'Tambah'}
+          </CButton>
+        </CModalFooter>
       </CModal>
 
       <CModal visible={confirmDeleteVisible} onClose={() => setConfirmDeleteVisible(false)}>
