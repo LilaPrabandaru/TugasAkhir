@@ -34,9 +34,9 @@ const AppHeader = () => {
         headerRef.current.classList.toggle('shadow-sm', document.documentElement.scrollTop > 0)
     })
     const today = new Date()
-    const formattedDate = today.toLocaleDateString('en-GB', {
+    const formattedDate = today.toLocaleDateString('id-ID', {
       day: '2-digit',
-      month: '2-digit',
+      month: 'long',
       year: 'numeric',
     })
     setCurrentDate(formattedDate)

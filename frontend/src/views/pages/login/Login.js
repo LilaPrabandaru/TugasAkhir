@@ -35,7 +35,7 @@ const Login = () => {
       navigate('/')
     } catch (error) {
       console.error('Login failed:', error)
-      setError('Email or password is incorrect')
+      setError('Email Atau Password Salah')
     }
   }
 
