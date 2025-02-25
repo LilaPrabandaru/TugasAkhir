@@ -32,7 +32,12 @@ const Login = () => {
       // Simpan token ke localStorage atau state management
       sessionStorage.setItem('access_token', data.access_token)
       sessionStorage.setItem('user_role', data.role)
-      navigate('/')
+      const userRole = data.role
+      if (userRole === 'admin') {
+        navigate('/')
+      } else {
+        navigate('/user')
+      }
     } catch (error) {
       console.error('Login failed:', error)
       setError('Email Atau Password Salah')
