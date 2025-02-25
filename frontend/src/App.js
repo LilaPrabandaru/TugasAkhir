@@ -8,6 +8,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 
 // Containers
 const DefaultLayout = React.lazy(() => import('./layout/DefaultLayout'))
+const DefaultUserLayout = React.lazy(() => import('./layout/DefaultUserLayout'))
 
 // Pages
 const Login = React.lazy(() => import('./views/pages/login/Login'))
@@ -80,6 +81,16 @@ const App = () => {
               element={
                 <ProtectedRoute allowedRoles={['admin']}>
                   <DefaultLayout />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Route untuk User Public */}
+            <Route
+              path="/user/*"
+              element={
+                <ProtectedRoute allowedRoles={['user']}>
+                  <DefaultUserLayout />
                 </ProtectedRoute>
               }
             />

@@ -29,7 +29,7 @@ import {
   CAlert,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilPencil, cilTrash } from '@coreui/icons'
+import { cilPencil, cilTrash, cilCheck } from '@coreui/icons'
 import { getAllPesanan, addPesanan, updatePesanan, deletePesanan } from 'src/services/orderService'
 
 const CustomDateInput = React.forwardRef(({ value, onClick, onChange, placeholder }, ref) => (
@@ -56,6 +56,8 @@ const Orders = () => {
   const [selectedPesananId, setSelectedPesananId] = useState(null)
   const [confirmDeleteVisible, setConfirmDeleteVisible] = useState(false)
   const [pesananToDelete, setPesananToDelete] = useState(null)
+  const [confirmDoneVisible, setConfirmDoneVisible] = useState(false)
+  const [pesananToDone, setPesananToDone] = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
   const [selectedDate, setSelectedDate] = useState(null)
   const [showModalAlert, setShowModalAlert] = useState(false) // State untuk alert di modal
@@ -114,11 +116,10 @@ const Orders = () => {
     }
 
     try {
-      let newPesanan
       if (editMode) {
         await updatePesanan(selectedPesananId, formData)
       } else {
-        newPesanan = await addPesanan(formData) // Simpan pesanan yang baru ditambahkan
+        const newPesanan = await addPesanan(formData) // Simpan pesanan yang baru ditambahkan
         setPesananList([...pesananList, newPesanan]) // Tambahkan ke state pesananList
       }
       fetchPesanan() // Pastikan tetap ambil data terbaru
@@ -148,6 +149,23 @@ const Orders = () => {
       setPesananToDelete(null)
     } catch (error) {
       console.error('Error deleting pesanan:', error)
+    }
+  }
+
+  const handleMarkDone = (pesanan) => {
+    setPesananToDone(pesanan)
+    setConfirmDoneVisible(true)
+  }
+
+  const confirmMarkDone = async () => {
+    try {
+      const updatedData = { ...pesananToDone, Status: 'Done' }
+      await updatePesanan(pesananToDone._id, updatedData)
+      fetchPesanan()
+      setConfirmDoneVisible(false)
+      setPesananToDone(null)
+    } catch (error) {
+      console.error('Error marking pesanan as done:', error)
     }
   }
 
@@ -237,6 +255,10 @@ const Orders = () => {
                 </CAccordionBody>
               </CAccordionItem>
             </CAccordion>
+            {/* Tombol baru untuk mengubah status menjadi Done */}
+            <CButton color="success" className="me-2" onClick={() => handleMarkDone(pesanan)}>
+              <CIcon icon={cilCheck} />
+            </CButton>
             <CButton color="warning" className="me-2" onClick={() => handleEdit(pesanan)}>
               <CIcon icon={cilPencil} />
             </CButton>
@@ -332,6 +354,7 @@ const Orders = () => {
         </CModalFooter>
       </CModal>
 
+      {/* Modal konfirmasi hapus */}
       <CModal visible={confirmDeleteVisible} onClose={() => setConfirmDeleteVisible(false)}>
         <CModalHeader>
           <CModalTitle>Konfirmasi Hapus</CModalTitle>
@@ -345,6 +368,24 @@ const Orders = () => {
           </CButton>
           <CButton color="danger" onClick={confirmDelete}>
             Hapus
+          </CButton>
+        </CModalFooter>
+      </CModal>
+
+      {/* Modal konfirmasi menyelesaikan pesanan */}
+      <CModal visible={confirmDoneVisible} onClose={() => setConfirmDoneVisible(false)}>
+        <CModalHeader>
+          <CModalTitle>Konfirmasi Selesaikan Pesanan</CModalTitle>
+        </CModalHeader>
+        <CModalBody>
+          <p>Apakah Anda yakin ingin menandai pesanan ini sebagai selesai?</p>
+        </CModalBody>
+        <CModalFooter>
+          <CButton color="secondary" onClick={() => setConfirmDoneVisible(false)}>
+            Batal
+          </CButton>
+          <CButton color="primary" onClick={confirmMarkDone}>
+            Selesai
           </CButton>
         </CModalFooter>
       </CModal>
