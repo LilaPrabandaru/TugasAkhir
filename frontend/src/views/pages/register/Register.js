@@ -32,7 +32,7 @@ const Register = () => {
       navigate('/login')
     } catch (error) {
       console.error('Registration failed:', error)
-      setError('Email already exists')
+      setError('Email Sudah Terdaftar')
     }
   }
 

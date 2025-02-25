@@ -26,7 +26,7 @@ import {
   CAccordionBody,
   CPagination,
   CPaginationItem,
-  CAlert, // Import CAlert
+  CAlert,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilPencil, cilTrash } from '@coreui/icons'
@@ -70,8 +70,10 @@ const Orders = () => {
   const fetchPesanan = async () => {
     try {
       const data = await getAllPesanan()
-      console.log('Data pesanan yang didapat:', data) // Debugging
-      setPesananList(data)
+      console.log('Data pesanan yang didapat:', data)
+      const filteredData = data.filter((pesanan) => pesanan.Status === 'Pending')
+      console.log('Data pesanan yang difilter:', filteredData)
+      setPesananList(filteredData)
     } catch (error) {
       console.error('Error fetching pesanan:', error)
     }

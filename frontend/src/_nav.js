@@ -40,7 +40,7 @@ if (userRole === 'admin') {
     {
       component: CNavItem,
       name: 'Order History',
-      to: '/orderHistory',
+      to: '/orderhistory',
       icon: <CIcon icon={cilHistory} customClassName="nav-icon" />,
     },
   )

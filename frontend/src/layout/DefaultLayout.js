@@ -5,6 +5,7 @@ import Dashboard from '../views/dashboard/Dashboard'
 import Orders from '../views/orders/Orders'
 import Menu from '../views/menu/Menu'
 import Karyawan from '../views/karyawan/Karyawan'
+import OrderHistory from '../views/orderHistory/OrderHistory'
 
 const DefaultLayout = () => {
   return (
@@ -19,6 +20,7 @@ const DefaultLayout = () => {
               <Route path="order" element={<Orders />} />
               <Route path="menu" element={<Menu />} />
               <Route path="karyawan" element={<Karyawan />} />
+              <Route path="orderhistory" element={<OrderHistory />} />
             </Routes>
           </AppContent>
         </div>
