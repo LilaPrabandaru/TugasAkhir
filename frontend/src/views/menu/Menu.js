@@ -12,6 +12,12 @@ import {
   CFormInput,
   CFormSelect,
   CAlert,
+  CTable,
+  CTableHead,
+  CTableRow,
+  CTableHeaderCell,
+  CTableBody,
+  CTableDataCell,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilPencil, cilTrash } from '@coreui/icons'
@@ -280,24 +286,24 @@ const Menu = () => {
       </CModal>
       {Object.keys(groupedMenuData).map((kategori) => (
         <CCard className="mb-4" key={kategori}>
-          <CCardHeader>{kategori}</CCardHeader>
+          <CCardHeader><b>{kategori}</b></CCardHeader>
           <CCardBody>
-            <table className="table">
-              <thead>
-                <tr>
-                  <th style={{ width: '40%', textAlign: 'left' }}>Nama</th>
-                  <th style={{ width: '20%', textAlign: 'center' }}>Harga</th>
-                  <th style={{ width: '20%', textAlign: 'center' }}>Tipe</th>
-                  <th style={{ width: '30%', textAlign: 'center' }}>Aksi</th>
-                </tr>
-              </thead>
-              <tbody>
+            <CTable bordered>
+              <CTableHead>
+                <CTableRow>
+                  <CTableHeaderCell style={{ width: '40%', textAlign: 'left'}}>Nama</CTableHeaderCell>
+                  <CTableHeaderCell style={{ width: '20%', textAlign: 'right' }}>Harga</CTableHeaderCell>
+                  <CTableHeaderCell style={{ width: '20%', textAlign: 'center' }}>Tipe</CTableHeaderCell>
+                  <CTableHeaderCell style={{ width: '30%', textAlign: 'center' }}>Aksi</CTableHeaderCell>
+                </CTableRow>
+              </CTableHead>
+              <CTableBody>
                 {groupedMenuData[kategori].map((menu) => (
-                  <tr key={menu._id}>
-                    <td style={{ width: '40%', textAlign: 'left' }}>{menu.Nama}</td>
-                    <td style={{ width: '20%', textAlign: 'center' }}>{menu.Harga}</td>
-                    <td style={{ width: '20%', textAlign: 'center' }}>{menu.Tipe}</td>
-                    <td style={{ width: '30%', textAlign: 'center' }}>
+                <CTableRow key={menu._id}>
+                  <CTableDataCell style={{ width: '40%', textAlign: 'left' }}>{menu.Nama}</CTableDataCell>
+                  <CTableDataCell style={{ width: '20%', textAlign: 'right' }}>Rp{menu.Harga.toLocaleString()}</CTableDataCell>
+                  <CTableDataCell style={{ width: '20%', textAlign: 'center' }}>{menu.Tipe}</CTableDataCell>
+                  <CTableDataCell style={{ width: '30%', textAlign: 'center' }}>
                       <CButton
                         color="warning"
                         onClick={() => handleOpenUpdateModal(menu)}
@@ -311,11 +317,11 @@ const Menu = () => {
                       >
                         <CIcon icon={cilTrash} />
                       </CButton>
-                    </td>
-                  </tr>
+                  </CTableDataCell>
+                </CTableRow>
                 ))}
-              </tbody>
-            </table>
+              </CTableBody>
+            </CTable>
           </CCardBody>
         </CCard>
       ))}

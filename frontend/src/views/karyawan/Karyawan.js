@@ -157,17 +157,14 @@ const Karyawan = () => {
           Tambah Karyawan
         </CButton>
       </div>
-      <CCard className="mt-4">
-        <CCardHeader>Karyawan</CCardHeader>
-        <CCardBody>
-          <CTable>
+          <CTable bordered>
             <CTableHead>
               <CTableRow>
-                <CTableHeaderCell>Email</CTableHeaderCell>
-                <CTableHeaderCell>Nama Lengkap</CTableHeaderCell>
-                <CTableHeaderCell>Nomor Telpon</CTableHeaderCell>
-                <CTableHeaderCell>Tanggal Lahir</CTableHeaderCell>
-                <CTableHeaderCell>Aksi</CTableHeaderCell>
+                <CTableHeaderCell style={{ width: '30%', textAlign: 'center'}}>Email</CTableHeaderCell>
+                <CTableHeaderCell style={{ width: '20%', textAlign: 'center'}}>Nama Lengkap</CTableHeaderCell>
+                <CTableHeaderCell style={{ width: '20%', textAlign: 'center'}}>Nomor Telpon</CTableHeaderCell>
+                <CTableHeaderCell style={{ width: '20%', textAlign: 'center'}}>Tanggal Lahir</CTableHeaderCell>
+                <CTableHeaderCell style={{ width: '10%', textAlign: 'center'}}>Aksi</CTableHeaderCell>
               </CTableRow>
             </CTableHead>
             <CTableBody>
@@ -189,8 +186,6 @@ const Karyawan = () => {
               ))}
             </CTableBody>
           </CTable>
-        </CCardBody>
-      </CCard>
 
       {/* Modal untuk Tambah/Update */}
       <CModal visible={modal} onClose={handleCloseUpdateModal}>
