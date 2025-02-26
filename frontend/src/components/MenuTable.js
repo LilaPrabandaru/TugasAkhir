@@ -13,7 +13,7 @@ const MenuTable = ({ menuItems, addToCart }) => {
       <CTableHead>
         <CTableRow>
           <CTableHeaderCell>Nama Menu</CTableHeaderCell>
-          <CTableHeaderCell>Harga</CTableHeaderCell>
+          <CTableHeaderCell style={ {textAlign: 'right' }}>Harga</CTableHeaderCell>
           <CTableHeaderCell>Jumlah</CTableHeaderCell>
           <CTableHeaderCell>Aksi</CTableHeaderCell>
         </CTableRow>
@@ -22,7 +22,7 @@ const MenuTable = ({ menuItems, addToCart }) => {
         {menuItems.map((item) => (
           <CTableRow key={item.id}>
             <CTableDataCell>{item.name}</CTableDataCell>
-            <CTableDataCell>Rp {item.price.toLocaleString()}</CTableDataCell>
+            <CTableDataCell style={ {textAlign: 'right' }}>Rp {item.price.toLocaleString()}</CTableDataCell>
             <CTableDataCell>
               <CFormInput
                 type="number"

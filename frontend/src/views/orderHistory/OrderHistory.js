@@ -83,7 +83,7 @@ const OrderHistory = () => {
             <p>Tanggal: {formatDate(pesanan.Tanggal)}</p>
             <p>Waktu: {pesanan.Waktu}</p>
             <p style={{ color: pesanan.Status === 'Pending' ? 'red' : 'green' }}>
-              Status: {pesanan.Status}
+              <b>Status: {pesanan.Status}</b>
             </p>
           </CCardHeader>
           <CCardBody>
