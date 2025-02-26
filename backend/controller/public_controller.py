@@ -1,5 +1,6 @@
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required
+import json
 
 class GetUser(Resource):
     @jwt_required()
@@ -19,4 +20,5 @@ class UserDashboard(Resource):
                 {"id": 2, "activity": "Reviewed a Cappuccino"},
             ]
         }
+        print(dashboard_data)
         return {"message": "User Dashboard Data", "data": dashboard_data}, 200
