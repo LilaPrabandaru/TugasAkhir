@@ -110,12 +110,11 @@ const OrderHistory = () => {
                         </CTableRow>
                       ))}
                       <CTableRow>
-                        <CTableDataCell></CTableDataCell>
-                        <CTableDataCell className="text-center">
+                        <CTableDataCell className="text-end" colSpan={2}>
                           <h6>Total Harga:</h6>
                         </CTableDataCell>
                         <CTableDataCell className="text-end">
-                          <h6>Rp {pesanan['total harga'].toLocaleString()}</h6>
+                          <h6>Rp{pesanan['total harga'].toLocaleString()}</h6>
                         </CTableDataCell>
                       </CTableRow>
                     </CTableBody>
