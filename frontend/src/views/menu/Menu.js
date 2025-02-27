@@ -171,24 +171,24 @@ const Menu = () => {
           </div>
 
           {Object.keys(groupedMenuData).map((kategori) => (
-            <div key={kategori} className="mb-5">
-              <h3 className="text-primary">{kategori}</h3>
+            <div key={kategori} className="mb-3">
+              <h3><b>{kategori}</b></h3>
               <CTable bordered hover responsive className="table table-striped">
                 <CTableHead>
                   <CTableRow>
-                    <CTableHeaderCell>Nama</CTableHeaderCell>
-                    <CTableHeaderCell>Harga</CTableHeaderCell>
-                    <CTableHeaderCell>Tipe</CTableHeaderCell>
-                    <CTableHeaderCell>Aksi</CTableHeaderCell>
+                    <CTableHeaderCell style={{width: '45%', textAlign: 'center'}}>Nama</CTableHeaderCell>
+                    <CTableHeaderCell style={{width: '20%', textAlign: 'right'}}>Harga</CTableHeaderCell>
+                    <CTableHeaderCell style={{width: '15%', textAlign: 'center'}}>Tipe</CTableHeaderCell>
+                    <CTableHeaderCell style={{width: '10%', textAlign: 'center'}}>Aksi</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
                   {groupedMenuData[kategori].map((menu) => (
                     <CTableRow key={menu._id}>
-                      <CTableDataCell>{menu.Nama}</CTableDataCell>
-                      <CTableDataCell>Rp{menu.Harga.toLocaleString()}</CTableDataCell>
-                      <CTableDataCell>{menu.Tipe}</CTableDataCell>
-                      <CTableDataCell>
+                      <CTableDataCell style={{width: '45%', textAlign: 'left'}}>{menu.Nama}</CTableDataCell>
+                      <CTableDataCell style={{width: '20%', textAlign: 'right'}}>Rp{menu.Harga.toLocaleString()}</CTableDataCell>
+                      <CTableDataCell style={{width: '15%', textAlign: 'center'}}>{menu.Tipe}</CTableDataCell>
+                      <CTableDataCell style={{width: '10%', textAlign: 'center'}}>
                         <CButton
                           onClick={() => handleOpenUpdateModal(menu)}
                           className="btn-warning me-2"
@@ -250,9 +250,11 @@ const Menu = () => {
           >
             <option>Pilih Kategori</option>
             <option>Ayam</option>
-            <option>Steak</option>
-            <option>Nasi Goreng</option>
-            <option>Minuman</option>
+            <option>Steak Original & Crispy</option>
+            <option>Spesial Nasi Goreng</option>
+            <option>Pelengkap</option>
+            <option>Menu Baru</option>
+            <option>Minuman Es/Panas</option>
           </CFormSelect>
         </CModalBody>
         <CModalFooter>
