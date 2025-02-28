@@ -79,6 +79,21 @@ class Database:
             print(f"Gagal insert data, other error: {err}")
         return status, data
     
+    def insert_one(self, collection_name, document):
+        """
+        Insert a single document into a collection.
+        :param collection_name: Name of the collection.
+        :param document: Document to insert.
+        :return: Inserted ID or None.
+        """
+        try:
+            collection = self.db[collection_name]
+            result = collection.insert_one(document)
+            return result.inserted_id
+        except Exception as e:
+            print(f"Error in insert_one: {e}")
+            return None
+    
     def update(self, collection_name, filter, value, upsert):
         status = False
         data = None

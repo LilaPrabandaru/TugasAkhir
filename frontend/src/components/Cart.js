@@ -20,6 +20,7 @@ import {
   CFormLabel,
   CFormInput,
 } from '@coreui/react';
+import { placeOrder } from '../services/publicService'; // Import the placeOrder function
 
 const Cart = ({ cartItems, removeFromCart, clearCart }) => {
   const [isPaymentModalOpen, setPaymentModalOpen] = useState(false);
@@ -54,7 +55,7 @@ const Cart = ({ cartItems, removeFromCart, clearCart }) => {
       alert('Masukkan nama pemesan!');
       return;
     }
-  
+
     // Prepare order data
     const orderData = {
       Nama_Pelanggan: tableNumber,
@@ -67,34 +68,21 @@ const Cart = ({ cartItems, removeFromCart, clearCart }) => {
       })),
       total_harga: cartItems.reduce((total, item) => total + item.price * item.quantity, 0),
     };
-  
+
     try {
-      // Send the order data to the backend
-      const response = await fetch('http://localhost:5000/user/dashboard/order', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(orderData),
-      });
-  
-      const result = await response.json();
-      if (response.ok) {
-        console.log('Order successfully added:', result);
-        alert('Pesanan berhasil dibuat! Nomor Pesanan: ' + result.order_id);
-  
-        // Clear the cart and close modals
-        clearCart();
-        setCartVisible(false);
-        setPaymentModalOpen(false);
-        setSuccessModalOpen(true);
-      } else {
-        console.error('Failed to add order:', result.message);
-        alert('Gagal membuat pesanan: ' + result.message);
-      }
+      // Use the placeOrder function from publicService.js
+      const result = await placeOrder(orderData);
+
+      console.log('Order successfully added:', result);
+
+      // Clear the cart and close modals
+      clearCart();
+      setCartVisible(false);
+      setPaymentModalOpen(false);
+      setSuccessModalOpen(true);
     } catch (error) {
       console.error('Error during order submission:', error);
-      alert('Terjadi kesalahan saat mengirim pesanan.');
+      alert('Gagal membuat pesanan: ' + (error.response?.data?.message || 'Terjadi kesalahan.'));
     }
   };
 
