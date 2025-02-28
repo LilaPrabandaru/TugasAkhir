@@ -130,22 +130,22 @@ class ProtectedUserAddPesanan(AddPesanan):
         return super().post()
 
 # Register Protected Routes for Admin
-api.add_resource(ProtectedGetKaryawan, '/karyawan')
-api.add_resource(ProtectedAddKaryawan, '/add_karyawan')
-api.add_resource(ProtectedUpdateKaryawan, '/update_karyawan/<string:karyawan_id>')
-api.add_resource(ProtectedDeleteKaryawan, '/delete_karyawan/<string:karyawan_id>')
+api.add_resource(ProtectedGetKaryawan, '/admin/karyawan')
+api.add_resource(ProtectedAddKaryawan, '/admin/add_karyawan')
+api.add_resource(ProtectedUpdateKaryawan, '/admin/update_karyawan/<string:karyawan_id>')
+api.add_resource(ProtectedDeleteKaryawan, '/admin/delete_karyawan/<string:karyawan_id>')
 
-api.add_resource(ProtectedGetMenu, '/menu')
-api.add_resource(ProtectedAddMenu, '/add_menu')
-api.add_resource(ProtectedUpdateMenu, '/update_menu/<string:menu_id>')
-api.add_resource(ProtectedDeleteMenu, '/delete_menu/<string:menu_id>')
+api.add_resource(ProtectedGetMenu, '/admin/menu')
+api.add_resource(ProtectedAddMenu, '/admin/add_menu')
+api.add_resource(ProtectedUpdateMenu, '/admin/update_menu/<string:menu_id>')
+api.add_resource(ProtectedDeleteMenu, '/admin/delete_menu/<string:menu_id>')
 
-api.add_resource(ProtectedGetAllPesanan, '/pesanan')
-api.add_resource(ProtectedGetPesananById, '/pesanan_id/<string:pesanan_id>')
-api.add_resource(ProtectedGetPesananByTanggal, '/pesanan_tanggal/<string:tanggal>')
-api.add_resource(ProtectedAddPesanan, '/add_pesanan')
-api.add_resource(ProtectedUpdatePesanan, '/update_pesanan/<string:pesanan_id>')
-api.add_resource(ProtectedDeletePesanan, '/delete_pesanan/<string:pesanan_id>')
+api.add_resource(ProtectedGetAllPesanan, '/admin/pesanan')
+api.add_resource(ProtectedGetPesananById, '/admin/pesanan_id/<string:pesanan_id>')
+api.add_resource(ProtectedGetPesananByTanggal, '/admin/pesanan_tanggal/<string:tanggal>')
+api.add_resource(ProtectedAddPesanan, '/admin/add_pesanan')
+api.add_resource(ProtectedUpdatePesanan, '/admin/update_pesanan/<string:pesanan_id>')
+api.add_resource(ProtectedDeletePesanan, '/admin/delete_pesanan/<string:pesanan_id>')
 
 #Register Protected Routes for User
 api.add_resource(ProtectedUserMenu, '/user/dashboard')

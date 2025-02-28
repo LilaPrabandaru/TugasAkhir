@@ -7,7 +7,7 @@ const access_token = sessionStorage.getItem('access_token')
 // Ambil semua karyawan
 export const getKaryawan = async () => {
   try {
-    const response = await axios.get(`${API_URL}/karyawan`, {
+    const response = await axios.get(`${API_URL}/admin/karyawan`, {
       headers: {
         Authorization: `Bearer ${access_token}`,
       },
@@ -22,7 +22,7 @@ export const getKaryawan = async () => {
 // Tambah karyawan
 export const addKaryawan = async (karyawan) => {
   try {
-    const response = await axios.post(`${API_URL}/add_karyawan`, karyawan, {
+    const response = await axios.post(`${API_URL}/admin/add_karyawan`, karyawan, {
       headers: {
         Authorization: `Bearer ${access_token}`,
       },
@@ -37,7 +37,7 @@ export const addKaryawan = async (karyawan) => {
 // Update karyawan
 export const updateKaryawan = async (karyawanId, karyawan) => {
   try {
-    const response = await axios.post(`${API_URL}/update_karyawan/${karyawanId}`, karyawan, {
+    const response = await axios.post(`${API_URL}/admin/update_karyawan/${karyawanId}`, karyawan, {
       headers: {
         Authorization: `Bearer ${access_token}`,
       },
@@ -52,7 +52,7 @@ export const updateKaryawan = async (karyawanId, karyawan) => {
 // Hapus karyawan
 export const deleteKaryawan = async (karyawanId) => {
   try {
-    await axios.delete(`${API_URL}/delete_karyawan/${karyawanId}`, {
+    await axios.delete(`${API_URL}/admin/delete_karyawan/${karyawanId}`, {
       headers: {
         Authorization: `Bearer ${access_token}`,
       },

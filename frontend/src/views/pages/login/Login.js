@@ -34,7 +34,7 @@ const Login = () => {
       sessionStorage.setItem('user_role', data.role)
       const userRole = data.role
       if (userRole === 'admin') {
-        navigate('/')
+        navigate('/admin/dashboard')
       } else {
         navigate('/user')
       }
