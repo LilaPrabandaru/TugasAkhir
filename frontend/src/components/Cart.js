@@ -11,6 +11,8 @@ const Cart = ({ cartItems, removeFromCart, clearCart }) => {
   const [selectedPayment, setSelectedPayment] = useState(null)
   const [isCartVisible, setCartVisible] = useState(true);
   const [tableNumber, setTableNumber] = useState("");
+  const [tableDate, setTableDate] = useState(new Date().toISOString().split("T")[0]);
+  const [tableTime, setTableTime] = useState(new Date().toLocaleTimeString("id-ID", { hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit" }));
 
   const togglePaymentModal = (state) => {
     setPaymentModalOpen(state);
@@ -33,7 +35,7 @@ const Cart = ({ cartItems, removeFromCart, clearCart }) => {
       return;
     }
     if (!tableNumber.trim()) {
-        alert("Masukkan nomor meja Anda!");
+        alert("Masukkan nama pemesan!");
         return;
       }
   
@@ -123,12 +125,25 @@ const Cart = ({ cartItems, removeFromCart, clearCart }) => {
           <hr />
           <p><strong>Total Bayar: </strong>Rp {cartItems.reduce((total, item) => total + item.price * item.quantity, 0).toLocaleString()}</p>
           <CForm>
-            <CFormLabel>Nomor Meja</CFormLabel>
+            <CFormLabel>Nama Pemesan</CFormLabel>
             <CFormInput
-                type="number"
-                placeholder="Masukkan nomor meja"
+                type="text"
+                placeholder="Masukkan nama pemesan"
                 value={tableNumber}
                 onChange={(e) => setTableNumber(e.target.value)}
+            />
+            <CFormLabel>Tanggal Pemesanan</CFormLabel>
+            <CFormInput 
+                type="date"
+                value={tableDate}
+                onChange={(e) => setTableDate(e.target.value)}
+            />
+            <CFormLabel>Waktu Pemesanan</CFormLabel>
+            <CFormInput 
+                type="time"
+                step="1"
+                value={tableTime}
+                onChange={(e) => setTableTime(e.target.value)}
             />
           </CForm>
           <p><strong>Pilih Metode Pembayaran:</strong></p>
