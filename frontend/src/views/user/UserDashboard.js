@@ -120,7 +120,7 @@ const UserDashboard = () => {
             borderRadius: '50%',
             width: '60px',
             height: '60px',
-            display: 'flex',
+            display: 'none',
             justifyContent: 'center',
             alignItems: 'center',
             fontSize: '24px',
