@@ -1,6 +1,6 @@
 from model import Database
 from bson import ObjectId
-from config import MONGO_DB, MONGO_MENU_COLLECTION
+from config import MONGO_DB, MONGO_MENU_COLLECTION, MONGO_PESANAN_COLLECTION
 import random, string
 
 class Public :
@@ -42,3 +42,27 @@ class Public :
             result['status'] = True
             result['message'] = 'Successfully Retrieved Menu Data'
         return result
+    
+    def addPesanan(self, pesanan_data):
+        try:
+            # Generate a unique ID for the order
+            randomString = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
+            generatedId = f"ODR{randomString}"
+
+            # Prepare the document to be inserted
+            pesanan_document = {
+                "_id": generatedId,
+                "Nama_Pelanggan": pesanan_data.get("Nama_Pelanggan"),
+                "Tanggal": pesanan_data.get("Tanggal"),
+                "Waktu": pesanan_data.get("Waktu"),
+                "Detail": pesanan_data.get("Detail", []),
+                "Status": "Pending",  # Default status is "Pending"
+                "total harga": pesanan_data.get("total_harga", 0)
+            }
+
+            # Insert the document into the Pesanan collection
+            self.connection.insert_one(collection_name=MONGO_PESANAN_COLLECTION, document=pesanan_document)
+            return {"status": True, "message": "Order successfully added", "order_id": generatedId}
+        except Exception as e:
+            print(f"Error adding order: {e}")
+            return {"status": False, "message": "An error occurred while adding the order"}
