@@ -98,10 +98,9 @@ const UserDashboard = () => {
 
   return (
     <CContainer>
-      <h2>Menu Makanan</h2>
-
+      <h2 style={{ textAlign: 'center' }}>Menu Makanan</h2>
       {/* Render grouped menu items */}
-      {Object.keys(groupedMenuItems).map(category => (
+      {Object.keys(groupedMenuItems).map((category) => (
         <CCard key={category} className="mb-4">
           <CCardHeader>{category}</CCardHeader>
           <CCardBody>
@@ -145,7 +144,7 @@ const UserDashboard = () => {
         />
       )}
     </CContainer>
-  );
+  )
 };
 
 export default UserDashboard;

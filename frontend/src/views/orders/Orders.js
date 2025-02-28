@@ -254,6 +254,7 @@ const Orders = () => {
                 </CAccordionBody>
               </CAccordionItem>
             </CAccordion>
+
             {/* Tombol baru untuk mengubah status menjadi Done */}
             <CButton color="success" className="me-2" onClick={() => handleMarkDone(pesanan)}>
               <CIcon icon={cilCheck} />
@@ -377,7 +378,7 @@ const Orders = () => {
           <CModalTitle>Konfirmasi Selesaikan Pesanan</CModalTitle>
         </CModalHeader>
         <CModalBody>
-          <p>Apakah Anda yakin ingin menandai pesanan ini sebagai selesai?</p>
+          <p>Apakah Anda yakin ingin menyelesaikan pesanan ini?</p>
         </CModalBody>
         <CModalFooter>
           <CButton color="secondary" onClick={() => setConfirmDoneVisible(false)}>

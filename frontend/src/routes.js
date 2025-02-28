@@ -9,11 +9,11 @@ const OrderHistory = React.lazy(() => import('./views/orderHistory/OrderHistory'
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
-  { path: '/dashboard', name: 'Dashboard', element: Dashboard },
-  { path: '/orders', name: 'Orders', element: Orders },
-  { path: '/menu', name: 'Menu', element: Menu },
-  { path: '/karyawan', name: 'Karyawan', element: Karyawan },
-  { path: '/orderhistory', name: 'Order History', element: OrderHistory },
+  { path: '/admin/dashboard', name: 'Dashboard', element: Dashboard },
+  { path: '/admin/orders', name: 'Orders', element: Orders },
+  { path: '/admin/menu', name: 'Menu', element: Menu },
+  { path: '/admin/karyawan', name: 'Karyawan', element: Karyawan },
+  { path: '/admin/orderhistory', name: 'Order History', element: OrderHistory },
 ]
 
 export default routes

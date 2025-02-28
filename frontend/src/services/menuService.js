@@ -7,7 +7,7 @@ const API_URL = `${config.API_URL}`
 // Ambil semua menu
 export const getMenu = async () => {
   try {
-    const response = await axios.get(`${API_URL}/menu`, {
+    const response = await axios.get(`${API_URL}/admin/menu`, {
       headers: {
         Authorization: `Bearer ${access_token}`,
       },
@@ -22,7 +22,7 @@ export const getMenu = async () => {
 // Tambah menu
 export const addMenu = async (menuData) => {
   try {
-    const response = await axios.post(`${API_URL}/add_menu`, menuData, {
+    const response = await axios.post(`${API_URL}/admin/add_menu`, menuData, {
       headers: {
         Authorization: `Bearer ${access_token}`,
       },
@@ -37,7 +37,7 @@ export const addMenu = async (menuData) => {
 // Update menu
 export const updateMenu = async (menuId, menuData) => {
   try {
-    const response = await axios.post(`${API_URL}/update_menu/${menuId}`, menuData, {
+    const response = await axios.post(`${API_URL}admin/update_menu/${menuId}`, menuData, {
       headers: {
         Authorization: `Bearer ${access_token}`,
       },
@@ -52,7 +52,7 @@ export const updateMenu = async (menuId, menuData) => {
 // Hapus menu
 export const deleteMenu = async (menuId) => {
   try {
-    const response = await axios.delete(`${API_URL}/delete_menu/${menuId}`, {
+    const response = await axios.delete(`${API_URL}/admin/delete_menu/${menuId}`, {
       headers: {
         Authorization: `Bearer ${access_token}`,
       },

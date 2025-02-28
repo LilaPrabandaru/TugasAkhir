@@ -7,7 +7,7 @@ const access_token = sessionStorage.getItem('access_token')
 // Ambil semua pesanan
 export const getAllPesanan = async () => {
   try {
-    const response = await axios.get(`${API_URL}/pesanan`, {
+    const response = await axios.get(`${API_URL}/admin/pesanan`, {
       headers: { Authorization: `Bearer ${access_token}` },
     })
     return response.data
@@ -20,7 +20,7 @@ export const getAllPesanan = async () => {
 // Tambah pesanan
 export const addPesanan = async (pesananData) => {
   try {
-    const response = await axios.post(`${API_URL}/add_pesanan`, pesananData, {
+    const response = await axios.post(`${API_URL}/admin/add_pesanan`, pesananData, {
       headers: { Authorization: `Bearer ${access_token}` },
     })
     return response.data
@@ -33,7 +33,7 @@ export const addPesanan = async (pesananData) => {
 // Update pesanan
 export const updatePesanan = async (pesananId, pesananData) => {
   try {
-    const response = await axios.post(`${API_URL}/update_pesanan/${pesananId}`, pesananData, {
+    const response = await axios.post(`${API_URL}/admin/update_pesanan/${pesananId}`, pesananData, {
       headers: { Authorization: `Bearer ${access_token}` },
     })
     return response.data
@@ -46,7 +46,7 @@ export const updatePesanan = async (pesananId, pesananData) => {
 // Hapus pesanan
 export const deletePesanan = async (pesananId) => {
   try {
-    await axios.delete(`${API_URL}/delete_pesanan/${pesananId}`, {
+    await axios.delete(`${API_URL}/admin/delete_pesanan/${pesananId}`, {
       headers: { Authorization: `Bearer ${access_token}` },
     })
   } catch (error) {

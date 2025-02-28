@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react'
 import {
   CCard,
   CCardHeader,
@@ -18,71 +18,72 @@ import {
   CTableHeaderCell,
   CTableBody,
   CTableDataCell,
-} from '@coreui/react';
-import CIcon from '@coreui/icons-react';
-import { cilPencil, cilTrash, cilSearch } from '@coreui/icons';
-import { getMenu, addMenu, updateMenu, deleteMenu } from 'src/services/menuService';
+} from '@coreui/react'
+import CIcon from '@coreui/icons-react'
+import { cilPencil, cilTrash, cilSearch } from '@coreui/icons'
+import { getMenu, addMenu, updateMenu, deleteMenu } from 'src/services/menuService'
 
 const Menu = () => {
-  const [menuData, setMenuData] = useState([]);
-  const [filteredMenuData, setFilteredMenuData] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [newMenu, setNewMenu] = useState({ Nama: '', Harga: '', Tipe: '', Kategori: '' });
-  const [modalVisible, setModalVisible] = useState(false);
-  const [updateModalVisible, setUpdateModalVisible] = useState(false);
-  const [currentMenu, setCurrentMenu] = useState(null);
-  const [alertVisible, setAlertVisible] = useState(false);
-  const [updateAlertVisible, setUpdateAlertVisible] = useState(false);
-  const [updateAlertMessage, setUpdateAlertMessage] = useState('');
-  const [confirmDeleteVisible, setConfirmDeleteVisible] = useState(false);
-  const [menuToDelete, setMenuToDelete] = useState(null);
+  const [menuData, setMenuData] = useState([])
+  const [filteredMenuData, setFilteredMenuData] = useState([])
+  const [searchQuery, setSearchQuery] = useState('')
+  const [newMenu, setNewMenu] = useState({ Nama: '', Harga: '', Tipe: '', Kategori: '' })
+  const [modalVisible, setModalVisible] = useState(false)
+  const [updateModalVisible, setUpdateModalVisible] = useState(false)
+  const [currentMenu, setCurrentMenu] = useState(null)
+  const [alertVisible, setAlertVisible] = useState(false)
+  const [updateAlertVisible, setUpdateAlertVisible] = useState(false)
+  const [updateAlertMessage, setUpdateAlertMessage] = useState('')
+  const [confirmDeleteVisible, setConfirmDeleteVisible] = useState(false)
+  const [menuToDelete, setMenuToDelete] = useState(null)
 
   useEffect(() => {
-    fetchMenuData();
-  }, []);
+    fetchMenuData()
+  }, [])
 
   const fetchMenuData = useCallback(async () => {
     try {
-      const data = await getMenu();
-      console.log('Fetched menu data:', data);
-      setMenuData(data);
-      setFilteredMenuData(data); // Initialize filtered data with all menu items
+      const data = await getMenu()
+      console.log('Fetched menu data:', data)
+      setMenuData(data)
+      setFilteredMenuData(data) // Initialize filtered data with all menu items
     } catch (error) {
-      console.error('Failed to fetch menu data:', error);
+      console.error('Failed to fetch menu data:', error)
     }
-  }, []);
+  }, [])
 
   const handleSearch = (e) => {
-    const query = e.target.value.toLowerCase();
-    setSearchQuery(query);
+    const query = e.target.value.toLowerCase()
+    setSearchQuery(query)
 
     // Filter menu data based on the search query
-    const filtered = menuData.filter((menu) =>
-      menu.Nama.toLowerCase().includes(query) || menu.Kategori.toLowerCase().includes(query)
-    );
-    setFilteredMenuData(filtered);
-  };
+    const filtered = menuData.filter(
+      (menu) =>
+        menu.Nama.toLowerCase().includes(query) || menu.Kategori.toLowerCase().includes(query),
+    )
+    setFilteredMenuData(filtered)
+  }
 
   const handleAddMenu = async () => {
     if (!newMenu.Nama || !newMenu.Harga || !newMenu.Tipe || !newMenu.Kategori) {
-      setAlertVisible(true);
-      return;
+      setAlertVisible(true)
+      return
     }
     try {
-      await addMenu(newMenu);
-      fetchMenuData();
-      setNewMenu({ Nama: '', Harga: '', Tipe: '', Kategori: '' });
-      setModalVisible(false);
+      await addMenu(newMenu)
+      fetchMenuData()
+      setNewMenu({ Nama: '', Harga: '', Tipe: '', Kategori: '' })
+      setModalVisible(false)
     } catch (error) {
-      console.error('Failed to add menu:', error);
+      console.error('Failed to add menu:', error)
     }
-  };
+  }
 
   const handleUpdateMenu = async () => {
     if (!newMenu.Nama || !newMenu.Harga || !newMenu.Tipe || !newMenu.Kategori) {
-      setUpdateAlertMessage('Semua Kolom Harus Di Isi');
-      setUpdateAlertVisible(true);
-      return;
+      setUpdateAlertMessage('Semua Kolom Harus Di Isi')
+      setUpdateAlertVisible(true)
+      return
     }
     if (
       currentMenu.Nama === newMenu.Nama &&
@@ -90,105 +91,120 @@ const Menu = () => {
       currentMenu.Tipe === newMenu.Tipe &&
       currentMenu.Kategori === newMenu.Kategori
     ) {
-      setUpdateAlertMessage('Tidak Ada Menu Yang Di Update');
-      setUpdateAlertVisible(true);
-      return;
+      setUpdateAlertMessage('Tidak Ada Menu Yang Di Update')
+      setUpdateAlertVisible(true)
+      return
     }
 
     try {
-      await updateMenu(currentMenu._id, newMenu);
-      fetchMenuData();
-      setUpdateModalVisible(false);
+      await updateMenu(currentMenu._id, newMenu)
+      fetchMenuData()
+      setUpdateModalVisible(false)
     } catch (error) {
-      console.error('Failed to update menu:', error.response ? error.response.data : error.message);
+      console.error('Failed to update menu:', error.response ? error.response.data : error.message)
     }
-  };
+  }
 
   const handleDeleteMenu = async () => {
     try {
-      await deleteMenu(menuToDelete);
-      fetchMenuData();
-      setConfirmDeleteVisible(false);
+      await deleteMenu(menuToDelete)
+      fetchMenuData()
+      setConfirmDeleteVisible(false)
     } catch (error) {
-      console.error('Failed to delete menu:', error);
+      console.error('Failed to delete menu:', error)
     }
-  };
+  }
 
   const handleOpenUpdateModal = (menu) => {
-    setCurrentMenu(menu);
-    setNewMenu(menu);
-    setUpdateModalVisible(true);
-  };
+    setCurrentMenu(menu)
+    setNewMenu(menu)
+    setUpdateModalVisible(true)
+  }
 
   const handleOpenConfirmDeleteModal = (menuId) => {
-    setMenuToDelete(menuId);
-    setConfirmDeleteVisible(true);
-  };
+    setMenuToDelete(menuId)
+    setConfirmDeleteVisible(true)
+  }
 
   const handleCloseModal = () => {
-    setNewMenu({ Nama: '', Harga: '', Tipe: '', Kategori: '' });
-    setModalVisible(false);
-    setAlertVisible(false);
-  };
+    setNewMenu({ Nama: '', Harga: '', Tipe: '', Kategori: '' })
+    setModalVisible(false)
+    setAlertVisible(false)
+  }
 
   const handleCloseUpdateModal = () => {
-    setNewMenu({ Nama: '', Harga: '', Tipe: '', Kategori: '' });
-    setUpdateModalVisible(false);
-    setUpdateAlertVisible(false);
-  };
+    setNewMenu({ Nama: '', Harga: '', Tipe: '', Kategori: '' })
+    setUpdateModalVisible(false)
+    setUpdateAlertVisible(false)
+  }
 
   const handleCloseConfirmDeleteModal = () => {
-    setConfirmDeleteVisible(false);
-    setMenuToDelete(null);
-  };
+    setConfirmDeleteVisible(false)
+    setMenuToDelete(null)
+  }
 
   // Group filtered menu data by category
   const groupedMenuData = filteredMenuData.reduce((acc, menu) => {
-    const { Kategori } = menu;
+    const { Kategori } = menu
     if (!acc[Kategori]) {
-      acc[Kategori] = [];
+      acc[Kategori] = []
     }
-    acc[Kategori].push(menu);
-    return acc;
-  }, {});
+    acc[Kategori].push(menu)
+    return acc
+  }, {})
 
   return (
-    <div className="container-fluid p-4">
+    <div>
+      <h2 style={{ textAlign: 'center' }}>Daftar Menu</h2>
+      {/* Search Bar */}
+      <div className="mb-3 d-flex justify-content-between align-items-center">
+        <CFormInput
+          placeholder="Cari Menu..."
+          value={searchQuery}
+          onChange={handleSearch}
+          style={{ width: '88%' }}
+        />
+        <CButton onClick={() => setModalVisible(true)} color="primary">
+          Tambah Menu
+        </CButton>
+      </div>
       <CCard className="shadow-sm">
-        <CCardHeader className="bg-primary text-white text-center">Daftar Menu</CCardHeader>
         <CCardBody>
-          {/* Search Bar */}
-          <div className="mb-3 d-flex justify-content-between align-items-center">
-            <CFormInput
-              placeholder="Cari Menu..."
-              value={searchQuery}
-              onChange={handleSearch}
-              style={{ width: '70%' }}
-            />
-            <CButton onClick={() => setModalVisible(true)} className="btn-success">
-              Tambah Menu
-            </CButton>
-          </div>
-
           {Object.keys(groupedMenuData).map((kategori) => (
             <div key={kategori} className="mb-3">
-              <h3><b>{kategori}</b></h3>
+              <h3>
+                <b>{kategori}</b>
+              </h3>
               <CTable bordered hover responsive className="table table-striped">
                 <CTableHead>
                   <CTableRow>
-                    <CTableHeaderCell style={{width: '45%', textAlign: 'center'}}>Nama</CTableHeaderCell>
-                    <CTableHeaderCell style={{width: '20%', textAlign: 'right'}}>Harga</CTableHeaderCell>
-                    <CTableHeaderCell style={{width: '15%', textAlign: 'center'}}>Tipe</CTableHeaderCell>
-                    <CTableHeaderCell style={{width: '10%', textAlign: 'center'}}>Aksi</CTableHeaderCell>
+                    <CTableHeaderCell style={{ width: '45%', textAlign: 'center' }}>
+                      Nama Menu
+                    </CTableHeaderCell>
+                    <CTableHeaderCell style={{ width: '20%', textAlign: 'right' }}>
+                      Harga
+                    </CTableHeaderCell>
+                    <CTableHeaderCell style={{ width: '15%', textAlign: 'center' }}>
+                      Tipe
+                    </CTableHeaderCell>
+                    <CTableHeaderCell style={{ width: '10%', textAlign: 'center' }}>
+                      Aksi
+                    </CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
                   {groupedMenuData[kategori].map((menu) => (
                     <CTableRow key={menu._id}>
-                      <CTableDataCell style={{width: '45%', textAlign: 'left'}}>{menu.Nama}</CTableDataCell>
-                      <CTableDataCell style={{width: '20%', textAlign: 'right'}}>Rp{menu.Harga.toLocaleString()}</CTableDataCell>
-                      <CTableDataCell style={{width: '15%', textAlign: 'center'}}>{menu.Tipe}</CTableDataCell>
-                      <CTableDataCell style={{width: '10%', textAlign: 'center'}}>
+                      <CTableDataCell style={{ width: '45%', textAlign: 'left' }}>
+                        {menu.Nama}
+                      </CTableDataCell>
+                      <CTableDataCell style={{ width: '20%', textAlign: 'right' }}>
+                        Rp{menu.Harga.toLocaleString()}
+                      </CTableDataCell>
+                      <CTableDataCell style={{ width: '15%', textAlign: 'center' }}>
+                        {menu.Tipe}
+                      </CTableDataCell>
+                      <CTableDataCell style={{ width: '10%', textAlign: 'center' }}>
                         <CButton
                           onClick={() => handleOpenUpdateModal(menu)}
                           className="btn-warning me-2"
@@ -218,7 +234,7 @@ const Menu = () => {
         </CModalHeader>
         <CModalBody>
           {alertVisible && (
-            <CAlert color="danger" onClose={() => setAlertVisible(false)} dismissible>
+            <CAlert color="warning" onClose={() => setAlertVisible(false)} dismissible>
               Semua Kolom Harus Di Isi
             </CAlert>
           )}
@@ -274,7 +290,7 @@ const Menu = () => {
         </CModalHeader>
         <CModalBody>
           {updateAlertVisible && (
-            <CAlert color="danger" onClose={() => setUpdateAlertVisible(false)} dismissible>
+            <CAlert color="warning" onClose={() => setUpdateAlertVisible(false)} dismissible>
               {updateAlertMessage}
             </CAlert>
           )}
@@ -337,7 +353,7 @@ const Menu = () => {
         </CModalFooter>
       </CModal>
     </div>
-  );
-};
+  )
+}
 
-export default Menu;
+export default Menu

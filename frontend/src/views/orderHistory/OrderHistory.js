@@ -43,17 +43,20 @@ const OrderHistory = () => {
 
   const indexOfLastItem = currentPage * itemsPerPage
   const indexOfFirstItem = indexOfLastItem - itemsPerPage
+
+  // Filter berdasarkan bulan dan tahun saja (tanpa memperhitungkan tanggal)
   const filteredPesananList = selectedDate
     ? pesananList.filter((pesanan) => {
         const pesananDate = new Date(pesanan.Tanggal)
         return (
           pesananDate.getFullYear() === selectedDate.getFullYear() &&
-          pesananDate.getMonth() === selectedDate.getMonth() &&
-          pesananDate.getDate() === selectedDate.getDate()
+          pesananDate.getMonth() === selectedDate.getMonth()
         )
       })
     : pesananList
+
   const currentItems = filteredPesananList.slice(indexOfFirstItem, indexOfLastItem)
+
   const formatDate = (dateStr) => {
     if (!dateStr) return ''
     const date = new Date(dateStr)
@@ -65,11 +68,14 @@ const OrderHistory = () => {
       <div className="d-flex justify-content-center mb-4">
         <DatePicker
           selected={selectedDate}
-          onChange={setSelectedDate}
-          placeholderText="Filter Tanggal"
-          dateFormat="yyyy-MM-dd"
+          onChange={(date) => {
+            setSelectedDate(date)
+            setCurrentPage(1) // Reset ke halaman pertama ketika filter berubah
+          }}
+          placeholderText="Filter Bulan dan Tahun"
+          dateFormat="MM/yyyy"
+          showMonthYearPicker
           className="form-control"
-          minDate={new Date()}
         />
         <CButton color="secondary" onClick={() => setSelectedDate(null)} className="ms-2">
           Clear

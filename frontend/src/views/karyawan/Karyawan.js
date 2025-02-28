@@ -157,35 +157,41 @@ const Karyawan = () => {
           Tambah Karyawan
         </CButton>
       </div>
-          <CTable bordered>
-            <CTableHead>
-              <CTableRow>
-                <CTableHeaderCell style={{ width: '30%', textAlign: 'center'}}>Email</CTableHeaderCell>
-                <CTableHeaderCell style={{ width: '20%', textAlign: 'center'}}>Nama Lengkap</CTableHeaderCell>
-                <CTableHeaderCell style={{ width: '20%', textAlign: 'center'}}>Nomor Telpon</CTableHeaderCell>
-                <CTableHeaderCell style={{ width: '20%', textAlign: 'center'}}>Tanggal Lahir</CTableHeaderCell>
-                <CTableHeaderCell style={{ width: '10%', textAlign: 'center'}}>Aksi</CTableHeaderCell>
-              </CTableRow>
-            </CTableHead>
-            <CTableBody>
-              {karyawanData.map((karyawan) => (
-                <CTableRow key={karyawan._id}>
-                  <CTableDataCell>{karyawan.Email}</CTableDataCell>
-                  <CTableDataCell>{karyawan.Nama_Lengkap}</CTableDataCell>
-                  <CTableDataCell>{karyawan.Nomor_Telp}</CTableDataCell>
-                  <CTableDataCell>{formatDate(karyawan.Tanggal_Lahir)}</CTableDataCell>
-                  <CTableDataCell>
-                    <CButton color="warning" onClick={() => handleOpenModal(karyawan)}>
-                      <CIcon icon={cilPencil} />
-                    </CButton>{' '}
-                    <CButton color="danger" onClick={() => handleOpenDeleteModal(karyawan._id)}>
-                      <CIcon icon={cilTrash} />
-                    </CButton>
-                  </CTableDataCell>
-                </CTableRow>
-              ))}
-            </CTableBody>
-          </CTable>
+      <CTable bordered hover responsive className="table table-striped">
+        <CTableHead>
+          <CTableRow>
+            <CTableHeaderCell style={{ width: '30%', textAlign: 'center' }}>Email</CTableHeaderCell>
+            <CTableHeaderCell style={{ width: '20%', textAlign: 'center' }}>
+              Nama Lengkap
+            </CTableHeaderCell>
+            <CTableHeaderCell style={{ width: '20%', textAlign: 'center' }}>
+              Nomor Telpon
+            </CTableHeaderCell>
+            <CTableHeaderCell style={{ width: '20%', textAlign: 'center' }}>
+              Tanggal Lahir
+            </CTableHeaderCell>
+            <CTableHeaderCell style={{ width: '10%', textAlign: 'center' }}>Aksi</CTableHeaderCell>
+          </CTableRow>
+        </CTableHead>
+        <CTableBody>
+          {karyawanData.map((karyawan) => (
+            <CTableRow key={karyawan._id}>
+              <CTableDataCell>{karyawan.Email}</CTableDataCell>
+              <CTableDataCell>{karyawan.Nama_Lengkap}</CTableDataCell>
+              <CTableDataCell>{karyawan.Nomor_Telp}</CTableDataCell>
+              <CTableDataCell>{formatDate(karyawan.Tanggal_Lahir)}</CTableDataCell>
+              <CTableDataCell>
+                <CButton color="warning" onClick={() => handleOpenModal(karyawan)}>
+                  <CIcon icon={cilPencil} />
+                </CButton>{' '}
+                <CButton color="danger" onClick={() => handleOpenDeleteModal(karyawan._id)}>
+                  <CIcon icon={cilTrash} />
+                </CButton>
+              </CTableDataCell>
+            </CTableRow>
+          ))}
+        </CTableBody>
+      </CTable>
 
       {/* Modal untuk Tambah/Update */}
       <CModal visible={modal} onClose={handleCloseUpdateModal}>
@@ -226,6 +232,9 @@ const Karyawan = () => {
                   })
                 }
                 dateFormat="yyyy-MM-dd"
+                showYearDropdown
+                scrollableYearDropdown
+                yearDropdownItemNumber={100}
                 customInput={<CustomDateInput />}
               />
               <CButton color="secondary" size="sm" className="ms-2" onClick={handleClearDate}>

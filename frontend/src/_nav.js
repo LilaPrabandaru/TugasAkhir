@@ -10,7 +10,7 @@ const menuItems = [
   {
     component: CNavItem,
     name: 'Dashboard',
-    to: '/dashboard',
+    to: '/admin/dashboard',
     icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
   },
 ]
@@ -22,25 +22,25 @@ if (userRole === 'admin') {
     {
       component: CNavItem,
       name: 'Orders',
-      to: '/orders',
+      to: '/admin/orders',
       icon: <CIcon icon={cilClipboard} customClassName="nav-icon" />,
     },
     {
       component: CNavItem,
       name: 'Menu',
-      to: '/menu',
+      to: '/admin/menu',
       icon: <CIcon icon={cilFastfood} customClassName="nav-icon" />,
     },
     {
       component: CNavItem,
       name: 'Karyawan',
-      to: '/karyawan',
+      to: '/admin/karyawan',
       icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
     },
     {
       component: CNavItem,
       name: 'Order History',
-      to: '/orderhistory',
+      to: '/admin/orderhistory',
       icon: <CIcon icon={cilHistory} customClassName="nav-icon" />,
     },
   )
