@@ -1,5 +1,6 @@
 from flask_restful import Resource
 import json
+from flask import request
 from model.public import Public
 
 public_model = Public()
