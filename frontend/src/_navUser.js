@@ -1,6 +1,6 @@
 import React from 'react'
 import CIcon from '@coreui/icons-react'
-import { cilSpeedometer, cilUser, cilClipboard, cilFastfood, cilAccountLogout, cilHistory } from '@coreui/icons'
+import { cilSpeedometer, cilAccountLogout, cilHistory } from '@coreui/icons'
 import { CNavItem, CNavTitle } from '@coreui/react'
 
 // Ambil role dari sessionStorage
@@ -10,37 +10,19 @@ const menuItems = [
   {
     component: CNavItem,
     name: 'Dashboard',
-    to: '/admin/dashboard',
+    to: '/user/dashboard',
     icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
   },
 ]
 
-// Jika user admin, tambahkan menu tambahan
-if (userRole === 'admin') {
+// Jika user dengan role 'user', tambahkan menu tambahan
+if (userRole === 'user') {
   menuItems.push(
-    { component: CNavTitle, name: 'Admin' },
-    {
-      component: CNavItem,
-      name: 'Orders',
-      to: '/admin/orders',
-      icon: <CIcon icon={cilClipboard} customClassName="nav-icon" />,
-    },
-    {
-      component: CNavItem,
-      name: 'Menu',
-      to: '/admin/menu',
-      icon: <CIcon icon={cilFastfood} customClassName="nav-icon" />,
-    },
-    {
-      component: CNavItem,
-      name: 'Karyawan',
-      to: '/admin/karyawan',
-      icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
-    },
+    { component: CNavTitle, name: 'User' },
     {
       component: CNavItem,
       name: 'Order History',
-      to: '/admin/orderhistory',
+      to: '/user/orderhistory',
       icon: <CIcon icon={cilHistory} customClassName="nav-icon" />,
     },
   )

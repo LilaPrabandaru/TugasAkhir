@@ -8,7 +8,7 @@ from controller.user_controller import Login, Register, Protected, Logout, Refre
 from controller.karyawan_controller import GetKaryawan, AddKaryawan, UpdateKaryawan, DeleteKaryawan
 from controller.menu_controller import GetMenu, AddMenu, UpdateMenu, DeleteMenu
 from controller.pesanan_controller import GetAllPesanan, GetPesananById, GetPesananByTanggal, AddPesanan, UpdatePesanan, DeletePesanan
-from controller.public_controller import GetMenu, AddPesanan
+from controller.public_controller import GetMenu, AddPesananUser, GetAllPesananUser
 
 app = Flask(__name__)
 CORS(app)
@@ -124,10 +124,15 @@ class ProtectedUserMenu(GetMenu):
     def get(self):
         return super().get()
     
-class ProtectedUserAddPesanan(AddPesanan):
+class ProtectedUserAddPesanan(AddPesananUser):
     @jwt_required()
     def post(self):
         return super().post()
+    
+class ProtectedGetAllPesananUser(GetAllPesananUser):
+    @jwt_required()
+    def get(self):
+        return super().get()
 
 # Register Protected Routes for Admin
 api.add_resource(ProtectedGetKaryawan, '/admin/karyawan')
@@ -150,6 +155,7 @@ api.add_resource(ProtectedDeletePesanan, '/admin/delete_pesanan/<string:pesanan_
 #Register Protected Routes for User
 api.add_resource(ProtectedUserMenu, '/user/dashboard')
 api.add_resource(ProtectedUserAddPesanan, '/user/dashboard/order')
+api.add_resource(ProtectedGetAllPesananUser, '/user/orderhistory')
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

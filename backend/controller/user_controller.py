@@ -43,6 +43,7 @@ class Login(Resource):
 
             return {
                 'user_id': result['user_id'],
+                'email' : result['email'],
                 'message': result['message'],
                 'access_token': access_token,
                 'refresh_token': refresh_token,
