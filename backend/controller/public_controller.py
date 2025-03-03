@@ -1,6 +1,6 @@
 from flask_restful import Resource
 import json
-from flask import request
+from flask import request, session
 from model.public import Public
 
 public_model = Public()
@@ -12,7 +12,7 @@ class GetMenu(Resource):
         else:
             return {'message': 'Menu Not Found!'}, 404
         
-class AddPesanan(Resource):
+class AddPesananUser(Resource):
     def post(self):
         try:
             # Parse JSON data from the request body
@@ -32,4 +32,24 @@ class AddPesanan(Resource):
                 return {"message": result["message"]}, 500
         except Exception as e:
             print(f"Error in AddPesanan: {e}")
+            return {"message": "An unexpected error occurred"}, 500
+        
+class GetAllPesananUser(Resource):
+    def get(self):
+        try:
+            # Retrieve the email from the query parameters or headers
+            email = request.args.get('email')  # Alternatively, use request.headers.get('Email')
+
+            if not email:
+                return {"message": "Email is required"}, 400
+
+            # Fetch orders for the specific email
+            result = public_model.getAllPesananByEmail(email)
+
+            if result['status']:
+                return result['data'], 200
+            else:
+                return {"message": "No orders found for this user"}, 404
+        except Exception as e:
+            print(f"Error in GetAllPesananUser: {e}")
             return {"message": "An unexpected error occurred"}, 500

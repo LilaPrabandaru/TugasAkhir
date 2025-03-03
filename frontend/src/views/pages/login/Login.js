@@ -30,6 +30,8 @@ const Login = () => {
       const data = await login(email, password)
       console.log('Login successful:', data)
       // Simpan token ke localStorage atau state management
+      sessionStorage.setItem('user_id', data.user_id)
+      sessionStorage.setItem('email', data.email)
       sessionStorage.setItem('access_token', data.access_token)
       sessionStorage.setItem('user_role', data.role)
       const userRole = data.role

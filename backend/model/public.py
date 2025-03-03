@@ -66,3 +66,26 @@ class Public :
         except Exception as e:
             print(f"Error adding order: {e}")
             return {"status": False, "message": "An error occurred while adding the order"}
+        
+    def getAllPesananByEmail(self, email):
+        try:
+            # Filter orders by email
+            filter = {"Nama_Pelanggan": email}  # Assuming the 'email' field exists in your database schema
+            status, data = self.connection.findMany(collection_name=MONGO_PESANAN_COLLECTION, filter=filter)
+
+            result = {'status': status, 'data': data, 'message': ''}
+
+            if len(data) == 0:
+                result['message'] = 'No orders found for this user'
+            elif not status:
+                result['message'] = 'An error occurred while retrieving orders'
+            else:
+                for item in result['data']:
+                    item['_id'] = str(item['_id'])  # Convert ObjectId to string
+                result['status'] = True
+                result['message'] = 'Successfully retrieved orders for the user'
+
+            return result
+        except Exception as e:
+            print(f"Error fetching orders by email: {e}")
+            return {"status": False, "message": "An unexpected error occurred"}

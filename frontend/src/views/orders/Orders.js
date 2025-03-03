@@ -71,13 +71,23 @@ const Orders = () => {
 
   const fetchPesanan = async () => {
     try {
-      const data = await getAllPesanan()
-      console.log('Data pesanan yang didapat:', data)
-      const filteredData = data.filter((pesanan) => pesanan.Status === 'Pending')
-      console.log('Data pesanan yang difilter:', filteredData)
-      setPesananList(filteredData)
+      const data = await getAllPesanan();
+      console.log('Data pesanan yang didapat:', data);
+  
+      // Filter only pending orders
+      const filteredData = data.filter((pesanan) => pesanan.Status === 'Pending');
+  
+      // Sort by the newest date (Tanggal)
+      const sortedData = filteredData.sort((a, b) => {
+        const dateA = new Date(a.Tanggal);
+        const dateB = new Date(b.Tanggal);
+        return dateB - dateA; // Descending order (newest first)
+      });
+  
+      console.log('Data pesanan yang difilter dan diurutkan:', sortedData);
+      setPesananList(sortedData); // Update state with sorted data
     } catch (error) {
-      console.error('Error fetching pesanan:', error)
+      console.error('Error fetching pesanan:', error);
     }
   }
 

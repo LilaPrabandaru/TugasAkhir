@@ -30,21 +30,19 @@ const Cart = ({ cartItems, removeFromCart, clearCart }) => {
   const [tableDate, setTableDate] = useState(new Date().toISOString().split('T')[0]);
   const [tableTime, setTableTime] = useState(
     new Date().toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' })
-  );
+  )
+
+  const userEmail = sessionStorage.getItem('email');
 
   const confirmPayment = async () => {
     if (!selectedPayment) {
       alert('Pilih metode pembayaran terlebih dahulu!');
       return;
     }
-    if (!tableNumber.trim()) {
-      alert('Masukkan nama pemesan!');
-      return;
-    }
 
     // Prepare order data
     const orderData = {
-      Nama_Pelanggan: tableNumber,
+      Nama_Pelanggan: userEmail,
       Tanggal: tableDate,
       Waktu: tableTime,
       Detail: cartItems.map((item) => ({
@@ -196,14 +194,6 @@ const Cart = ({ cartItems, removeFromCart, clearCart }) => {
               </CTable>
               <hr />
               <CForm>
-                <CFormLabel style={{ fontSize: '16px', fontWeight: 'bold' }}>Nama Pemesan</CFormLabel>
-                <CFormInput
-                  type="text"
-                  placeholder="Masukkan nama pemesan"
-                  value={tableNumber}
-                  onChange={(e) => setTableNumber(e.target.value)}
-                  style={{ marginBottom: '15px', fontSize: '16px' }}
-                />
                 <CFormLabel style={{ fontSize: '16px', fontWeight: 'bold' }}>Tanggal Pemesanan</CFormLabel>
                 <CFormInput
                   type="date"

@@ -30,14 +30,26 @@ const OrderHistory = () => {
   useEffect(() => {
     fetchPesanan()
   }, [])
-
+  
   const fetchPesanan = async () => {
     try {
-      const data = await getAllPesanan()
-      const filteredData = data.filter((pesanan) => pesanan.Status === 'Done')
-      setPesananList(filteredData)
+      const data = await getAllPesanan(); // Ambil semua data pesanan
+      console.log('Data pesanan yang didapat:', data);
+  
+      // Filter hanya pesanan dengan status 'Done'
+      const filteredData = data.filter((pesanan) => pesanan.Status === 'Done');
+  
+      // Urutkan data berdasarkan Tanggal (dari yang terbaru)
+      const sortedData = filteredData.sort((a, b) => {
+        const dateA = new Date(a.Tanggal); // Konversi string tanggal ke objek Date
+        const dateB = new Date(b.Tanggal);
+        return dateB - dateA; // Urutkan secara descending (terbaru di atas)
+      });
+  
+      console.log('Data pesanan yang difilter dan diurutkan:', sortedData);
+      setPesananList(sortedData); // Simpan data yang sudah diurutkan ke state
     } catch (error) {
-      console.error('Error fetching pesanan:', error)
+      console.error('Error fetching pesanan:', error);
     }
   }
 
