@@ -1,8 +1,0 @@
-{
-  "dependencies": {
-    "react-clock": "^5.1.0",
-    "react-particles": "^2.12.2",
-    "react-time-picker": "^7.0.0",
-    "tsparticles": "^3.8.1"
-  }
-}
