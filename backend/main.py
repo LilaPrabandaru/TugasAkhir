@@ -8,7 +8,7 @@ from controller.user_controller import Login, Register, Protected, Logout, Refre
 from controller.karyawan_controller import GetKaryawan, AddKaryawan, UpdateKaryawan, DeleteKaryawan
 from controller.menu_controller import GetMenu, AddMenu, UpdateMenu, DeleteMenu
 from controller.pesanan_controller import GetAllPesanan, GetPesananById, GetPesananByTanggal, AddPesanan, UpdatePesanan, DeletePesanan
-from controller.public_controller import GetMenu, AddPesananUser, GetAllPesananUser
+from controller.public_controller import GetMenu, AddPesananUser, GetAllPesananUser, UpdatePaymentStatus
 
 app = Flask(__name__)
 CORS(app)
@@ -34,6 +34,7 @@ api.add_resource(Register, '/register')
 api.add_resource(Protected, '/protected')
 api.add_resource(RefreshToken, '/refresh_token')
 api.add_resource(Logout, '/logout')
+api.add_resource(UpdatePaymentStatus, '/api/update-payment-status')
 
 
 # Karyawan Routes

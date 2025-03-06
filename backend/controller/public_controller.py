@@ -53,3 +53,21 @@ class GetAllPesananUser(Resource):
         except Exception as e:
             print(f"Error in GetAllPesananUser: {e}")
             return {"message": "An unexpected error occurred"}, 500
+        
+class UpdatePaymentStatus(Resource):
+    def post(self):
+        try:
+            data = request.get_json()
+
+            if "id" not in data or "status" not in data:
+                return {"message": "Missing order ID or status"}, 400
+
+            result = public_model.updatePaymentStatus(data["id"], data["status"])
+
+            if result["status"]:
+                return {"message": result["message"]}, 200
+            else:
+                return {"message": result["message"]}, 404
+        except Exception as e:
+            print(f"Error in UpdatePaymentStatus: {e}")
+            return {"message": "An unexpected error occurred"}, 500
