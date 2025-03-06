@@ -75,7 +75,7 @@ const Orders = () => {
       console.log('Data pesanan yang didapat:', data);
   
       // Filter only pending orders
-      const filteredData = data.filter((pesanan) => pesanan.Status === 'Pending');
+      const filteredData = data.filter((pesanan) => pesanan.Status === 'Pending' || pesanan.Status === 'Not Paid');
   
       // Sort by the newest date (Tanggal)
       const sortedData = filteredData.sort((a, b) => {
@@ -224,7 +224,10 @@ const Orders = () => {
             <p>Nama Pelanggan: {pesanan.Nama_Pelanggan}</p>
             <p>Tanggal: {formatDate(pesanan.Tanggal)}</p>
             <p>Waktu: {pesanan.Waktu}</p>
-            <p style={{ color: pesanan.Status === 'Pending' ? 'red' : 'green' }}>
+            <p style={{ 
+              color: pesanan.Status === 'Pending' ? 'red' : 
+              pesanan.Status === 'Not Paid' ? 'yellow' : 
+              'green' }}>
               <b> Status: {pesanan.Status} </b>
             </p>
           </CCardHeader>

@@ -10,6 +10,7 @@ const UserDashboard = () => {
   const [error, setError] = useState(null); // Error state
   const [cartItems, setCartItems] = useState([]);
   const [isCartVisible, setIsCartVisible] = useState(false);
+  const [showSplash, setShowSplash] = useState(true); // Splash screen state
 
   // Fetch menu data from the backend
   useEffect(() => {
@@ -94,6 +95,20 @@ const UserDashboard = () => {
 
   if (error) {
     return <div>Error: {error}</div>;
+  }
+
+  if (showSplash) {
+    return (
+      <div style={{
+        display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center',
+        height: '100vh', textAlign: 'center', backgroundColor: '#f8f9fa'
+      }}>
+        <img src="/path-to-restaurant-image.jpg" alt="Restaurant" style={{ width: '80%', maxWidth: '400px', borderRadius: '10px' }} />
+        <CButton color="primary" size="lg" style={{ marginTop: '20px' }} onClick={() => setShowSplash(false)}>
+          See the Menu
+        </CButton>
+      </div>
+    );
   }
 
   return (

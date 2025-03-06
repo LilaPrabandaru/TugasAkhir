@@ -56,7 +56,7 @@ class Public :
                 "Tanggal": pesanan_data.get("Tanggal"),
                 "Waktu": pesanan_data.get("Waktu"),
                 "Detail": pesanan_data.get("Detail", []),
-                "Status": "Pending",  # Default status is "Pending"
+                "Status": "Not Paid",  # Default status is "Not Paid"
                 "total harga": pesanan_data.get("total_harga", 0)
             }
 
@@ -88,4 +88,19 @@ class Public :
             return result
         except Exception as e:
             print(f"Error fetching orders by email: {e}")
+            return {"status": False, "message": "An unexpected error occurred"}
+        
+    def updatePaymentStatus(self, order_id, status):
+        try:
+            filter = {"_id": order_id}  # Match the order by its ID
+            update = {"$set": {"Status": status}}  # Update the "Status" field
+            
+            result = self.connection.update_one(collection_name=MONGO_PESANAN_COLLECTION, filter=filter, update=update)
+            
+            if result.modified_count > 0:
+                return {"status": True, "message": "Payment status updated successfully"}
+            else:
+                return {"status": False, "message": "Order not found or status unchanged"}
+        except Exception as e:
+            print(f"Error updating payment status: {e}")
             return {"status": False, "message": "An unexpected error occurred"}
