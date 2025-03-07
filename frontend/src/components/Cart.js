@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   CCard,
   CCardBody,
@@ -20,26 +20,40 @@ import {
   CFormLabel,
   CFormInput,
 } from '@coreui/react';
-import { placeOrder } from '../services/publicService'; // Import the placeOrder function
+import axios from 'axios';
+import config from '../config'
+import { placeOrder, updateOrderStatus, getOrderStatus } from '../services/publicService';
+
 
 const Cart = ({ cartItems, removeFromCart, clearCart }) => {
   const [isCartModalOpen, setIsCartModalOpen] = useState(false); // Controls cart modal visibility
   const [isSuccessModalOpen, setSuccessModalOpen] = useState(false);
-  const [selectedPayment, setSelectedPayment] = useState(null);
-  const [tableNumber, setTableNumber] = useState('');
+  const [paymentStatus, setPaymentStatus] = useState('Not Paid');
+  const [isTimeValid, setIsTimeValid] = useState(false);
   const [tableDate, setTableDate] = useState(new Date().toISOString().split('T')[0]);
-  const [tableTime, setTableTime] = useState(
-    new Date().toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' })
-  )
+  const [tableTime, setTableTime] = useState()
+  const [orderTotal, setOrderTotal] = useState(0);
+  const [orderId, setOrderId] = useState(null);
 
   const userEmail = sessionStorage.getItem('email');
 
+  useEffect(() => {
+    if (tableTime) {
+      setIsTimeValid(true);
+    } else {
+      setIsTimeValid(false);
+    }
+  }, [tableTime]);
+
   const confirmPayment = async () => {
-    if (!selectedPayment) {
-      alert('Pilih metode pembayaran terlebih dahulu!');
+
+    console.log('Table Time:', tableTime);
+    console.log('Is Time Valid:', isTimeValid);
+
+    if (!isTimeValid) {
+      alert('Silakan isi waktu pemesanan terlebih dahulu!');
       return;
     }
-
     // Prepare order data
     const orderData = {
       Nama_Pelanggan: userEmail,
@@ -55,8 +69,22 @@ const Cart = ({ cartItems, removeFromCart, clearCart }) => {
 
     try {
       // Use the placeOrder function from publicService.js
-      const result = await placeOrder(orderData);
-      console.log('Order successfully added:', result);
+      
+      const orderResult = await placeOrder(orderData);
+      if(orderResult.status){
+        console.log(orderResult.payment_url)
+        window.open(orderResult.payment_url)
+      }
+      const newOrderId = orderResult.order_id; // Assuming backend returns order ID
+      setOrderId(newOrderId);
+      
+      console.log('Order successfully added:', orderResult);
+
+      const total = cartItems.reduce(
+        (total, item) => total + item.price * item.quantity, 
+        0
+      );
+      setOrderTotal(total);
 
       // Clear the cart and close modals
       clearCart();
@@ -67,6 +95,19 @@ const Cart = ({ cartItems, removeFromCart, clearCart }) => {
       alert('Gagal membuat pesanan: ' + (error.response?.data?.message || 'Terjadi kesalahan.'));
     }
   };
+  
+    // Function to manually update status to Pending
+    const updateToPending = async () => {
+      try {
+        await updateOrderStatus(orderId, 'Pending');
+        setPaymentStatus('Pending');
+        console.log('Status berhasil diperbarui menjadi Pending.');
+      } catch (error) {
+        console.error('Error updating status to Pending:', error);
+        console.log('Gagal memperbarui status ke Pending.');
+      }
+    };
+  
 
   return (
     <>
@@ -208,28 +249,23 @@ const Cart = ({ cartItems, removeFromCart, clearCart }) => {
                   onChange={(e) => setTableTime(e.target.value)}
                   style={{ marginBottom: '15px', fontSize: '16px' }}
                 />
+                {!isTimeValid && (
+                  <small style={{ color: 'red' }}>Waktu pemesanan wajib diisi!</small>
+                )}
               </CForm>
-              <p style={{ fontSize: '18px', fontWeight: 'bold' }}>
+              {/* <p style={{ fontSize: '18px', fontWeight: 'bold' }}>
                 Pilih Metode Pembayaran:
-              </p>
-              <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+              </p> */}
+              {/* <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
                 <CButton
-                  color={selectedPayment === 'Transfer Bank' ? 'primary' : 'secondary'}
+                  color={selectedPayment === 'QRIS' ? 'primary' : 'secondary'}
                   className="m-1"
-                  onClick={() => setSelectedPayment('Transfer Bank')}
+                  onClick={() => setSelectedPayment('QRIS')}
                   style={{ fontSize: '16px', padding: '10px 20px' }}
                 >
-                  Transfer Bank
+                  QRIS
                 </CButton>
-                <CButton
-                  color={selectedPayment === 'E-Wallet' ? 'primary' : 'secondary'}
-                  className="m-1"
-                  onClick={() => setSelectedPayment('E-Wallet')}
-                  style={{ fontSize: '16px', padding: '10px 20px' }}
-                >
-                  E-Wallet
-                </CButton>
-              </div>
+              </div> */}
             </>
           )}
         </CModalBody>
@@ -242,16 +278,16 @@ const Cart = ({ cartItems, removeFromCart, clearCart }) => {
             Batal
           </CButton>
           <CButton
-            color="success"
             onClick={confirmPayment}
+            color='success'
             style={{ fontSize: '16px', padding: '10px 20px' }}
+            disabled={!isTimeValid} // Nonaktifkan tombol jika waktu tidak valid
           >
             Bayar Sekarang
           </CButton>
         </CModalFooter>
       </CModal>
 
-      {/* Success Modal with Centered Message & Blur Background */}
       <CModal
         visible={isSuccessModalOpen}
         onClose={() => setSuccessModalOpen(false)}
@@ -261,13 +297,43 @@ const Cart = ({ cartItems, removeFromCart, clearCart }) => {
           alignItems: 'center',
           justifyContent: 'center',
           background: 'rgba(0, 0, 0, 0.5)',
-          animation: 'fadeIn 0.3s ease-in-out',
         }}
       >
-        <CModalBody style={{ textAlign: 'center', padding: '40px' }}>
-          <h2>🎉 Pembayaran Berhasil!</h2>
-          <p>Terima kasih telah berbelanja. Pesanan Anda sedang diproses.</p>
-          <CButton color="success" onClick={() => setSuccessModalOpen(false)}>
+        <CModalBody style={{ textAlign: 'center', padding: 40, background: '#212631', borderRadius: 15 }}>
+          {paymentStatus === 'Not Paid' ? (
+            <>
+              <h2>🎉 Pembayaran Berhasil!</h2>
+              <p>Terima kasih telah melakukan pembayaran.</p>
+            </>
+          ) : paymentStatus === 'Pending' ? (
+            <>
+              <h2>📱 Pembayaran Terkonfirmasi</h2>
+              <p>Silahkan menunggu pesanan anda dibuat.</p>
+            </>
+          ) : (
+            <>
+              <h2>❌ Pembayaran Belum Dilakukan</h2>
+              <p>Silakan selesaikan pembayaran untuk melanjutkan.</p>
+            </>
+          )}
+
+          {/* Button to manually update status to Pending */}
+          {paymentStatus === 'Not Paid' && (
+            <CButton
+              color="warning"
+              onClick={updateToPending}
+              style={{ marginTop: 20, width: 150, marginRight: 10 }}
+            >
+              Cek Pembayaran
+            </CButton>
+          )}
+
+          {/* Close Button */}
+          <CButton
+            color="secondary"
+            onClick={() => setSuccessModalOpen(false)}
+            style={{ marginTop: 20, width: 150 }}
+          >
             Tutup
           </CButton>
         </CModalBody>

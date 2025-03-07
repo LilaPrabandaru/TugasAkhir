@@ -106,7 +106,7 @@ const OrderHistoryUser = () => {
                 <p>Nama Pelanggan: {pesanan.Nama_Pelanggan}</p>
                 <p>Tanggal: {formatDate(pesanan.Tanggal)}</p>
                 <p>Waktu: {pesanan.Waktu}</p>
-                <p style={{ color: pesanan.Status === 'Pending' ? 'red' : 'green' }}>
+                <p style={{ color: pesanan.Status === 'Pending' ? 'yellow' : 'green' }}>
                 <b>Status: {pesanan.Status}</b>
                 </p>
             </CCardHeader>

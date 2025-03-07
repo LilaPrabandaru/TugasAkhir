@@ -56,3 +56,48 @@ export const placeOrder = async (orderData) => {
     throw error; // Re-throw the error for handling in the frontend
   }
 };
+
+export const updateOrderStatus = async (orderId, status) => {
+  try {
+    const response = await axios.put(`${API_URL}/user/update_status/${orderId}`, {
+      status: status,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error updating order status:', error);
+    throw error;
+  }
+};
+
+export const getPaymentUrl = async (orderId, totalAmount) => {
+  try {
+    const response = await axios.post(
+      `${API_URL}/user/dashboard/order`,
+      { 
+        Nama_Pelanggan: userEmail,
+        Tanggal: tableDate,
+        Waktu: tableTime,
+        Detail: cartItems,
+        total_harga: totalAmount
+      },
+      getAuthHeaders()
+    );
+    return response.data.payment_url;
+  } catch (error) {
+    console.error('Payment creation error:', error);
+    throw error;
+  }
+};
+
+export const getOrderStatus = async (orderId) => {
+  try {
+    const response = await axios.get(
+      `${API_URL}/user/order-status/${orderId}`,
+      getAuthHeaders()
+    );
+    return response.data.status; // Returns "Not Paid", "Pending", or "Paid"
+  } catch (error) {
+    console.error('Error fetching order status:', error);
+    throw error;
+  }
+};

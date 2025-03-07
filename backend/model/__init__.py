@@ -43,6 +43,18 @@ class Database:
 
         return result
     
+    def find_status(self, collection_name, filter):
+        try:
+            collection = self.db[collection_name]
+            document = collection.find_one(filter)
+            if document:
+                return True, document  # Success: True, Data: document
+            else:
+                return False, None  # Success: False, Data: None
+        except Exception as e:
+            print(f"Error in find_one: {e}")
+            return False, None
+    
     def findMany(self, collection_name, filter):
         status = False
         data = None
@@ -107,6 +119,36 @@ class Database:
         except Exception as err:
             print(f"Gagal update data, other error: {err}")
         return status, data
+    
+    def update_one(self, collection_name, filter_query, update_data, upsert=False):
+        """
+        Update a single document in the collection.
+        
+        :param collection_name: Name of the collection
+        :param filter_query: Query to find the document to update
+        :param update_data: Update operations (e.g., {"$set": {...}})
+        :param upsert: If True, insert new document if none match
+        :return: Tuple (success: bool, result: dict)
+        """
+        try:
+            collection = self.db[collection_name]
+            result = collection.update_one(
+                filter=filter_query,
+                update=update_data,
+                upsert=upsert
+            )
+            
+            return True, {
+                "matched_count": result.matched_count,
+                "modified_count": result.modified_count,
+                "upserted_id": result.upserted_id
+            }
+        except errors.PyMongoError as pymongo_err:
+            print(f"MongoDB error during update: {pymongo_err}")
+            return False, {"error": str(pymongo_err)}
+        except Exception as e:
+            print(f"General error during update: {e}")
+            return False, {"error": str(e)}
     
     def delete(self, collection_name, filter):
         status = False

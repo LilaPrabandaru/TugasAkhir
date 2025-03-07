@@ -1,11 +1,18 @@
 from model import Database
 from bson import ObjectId
-from config import MONGO_DB, MONGO_MENU_COLLECTION, MONGO_PESANAN_COLLECTION
+from config import MONGO_DB, MONGO_MENU_COLLECTION, MONGO_PESANAN_COLLECTION, MIDTRANS_CLIENT_KEY, MIDTRANS_SERVER_KEY
 import random, string
+import midtransclient
 
 class Public :
     def __init__(self):
         self.connection = Database(MONGO_DB)
+        # Initialize Midtrans client
+        self.midtrans_snap = midtransclient.Snap(
+            server_key=MIDTRANS_SERVER_KEY,
+            client_key=MIDTRANS_CLIENT_KEY,
+            is_production=False  # Use 'is_production' instead of 'environment'
+        )
         
     def generateId(self):
         randomString = ''.join(random.choices(string.digits, k=4))
@@ -46,7 +53,7 @@ class Public :
     def addPesanan(self, pesanan_data):
         try:
             # Generate a unique ID for the order
-            randomString = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
+            randomString = ''.join(random.choices(string.digits, k=4))
             generatedId = f"ODR{randomString}"
 
             # Prepare the document to be inserted
@@ -92,15 +99,42 @@ class Public :
         
     def updatePaymentStatus(self, order_id, status):
         try:
-            filter = {"_id": order_id}  # Match the order by its ID
-            update = {"$set": {"Status": status}}  # Update the "Status" field
+            filter_query = {"_id": order_id}  # Match the order by its ID
+            update_data = {"$set": {"Status": status}}  # Update the "Status" field
             
-            result = self.connection.update_one(collection_name=MONGO_PESANAN_COLLECTION, filter=filter, update=update)
+            # Use the new update_one method
+            success, result = self.connection.update_one(
+                collection_name=MONGO_PESANAN_COLLECTION,
+                filter_query=filter_query,
+                update_data=update_data
+            )
             
-            if result.modified_count > 0:
+            if success and result.get("modified_count", 0) > 0:
                 return {"status": True, "message": "Payment status updated successfully"}
             else:
                 return {"status": False, "message": "Order not found or status unchanged"}
         except Exception as e:
             print(f"Error updating payment status: {e}")
             return {"status": False, "message": "An unexpected error occurred"}
+        
+    def create_midtrans_transaction(self, order_id, total_amount):
+        try:
+            param = {
+                "transaction_details": {
+                    "order_id": order_id,
+                    "gross_amount": total_amount
+                },
+                "payment_type": "qris",  # Or "qris" for QRIS
+                "qris": {
+                    "enable_callback": True,
+                    "callback_url": "https://05f1-139-255-192-106.ngrok-free.app/midtrans-notification-handler"
+                }
+            }
+            transaction = self.midtrans_snap.create_transaction(param)
+            print(transaction)
+            return transaction['redirect_url']
+        except Exception as e:
+            print("========MASUK SINI ERRORNYA=======")
+            print("SERVER_KEY:", MIDTRANS_SERVER_KEY)
+            print(f"Midtrans error: {e}")
+            return None
