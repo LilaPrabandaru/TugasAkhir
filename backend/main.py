@@ -8,7 +8,7 @@ from controller.user_controller import Login, Register, Protected, Logout, Refre
 from controller.karyawan_controller import GetKaryawan, AddKaryawan, UpdateKaryawan, DeleteKaryawan
 from controller.menu_controller import GetMenu, AddMenu, UpdateMenu, DeleteMenu
 from controller.pesanan_controller import GetAllPesanan, GetPesananById, GetPesananByTanggal, AddPesanan, UpdatePesanan, DeletePesanan
-from controller.public_controller import GetMenu, AddPesananUser, GetAllPesananUser, UpdatePaymentStatus
+from controller.public_controller import GetMenu, AddPesananUser, GetAllPesananUser, UpdatePaymentStatus, GetOrderStatus, MidtransNotification
 
 app = Flask(__name__)
 CORS(app)
@@ -34,7 +34,7 @@ api.add_resource(Register, '/register')
 api.add_resource(Protected, '/protected')
 api.add_resource(RefreshToken, '/refresh_token')
 api.add_resource(Logout, '/logout')
-api.add_resource(UpdatePaymentStatus, '/api/update-payment-status')
+
 
 
 # Karyawan Routes
@@ -134,6 +134,12 @@ class ProtectedGetAllPesananUser(GetAllPesananUser):
     @jwt_required()
     def get(self):
         return super().get()
+    
+class ProtectedUpdateStatusOrder(UpdatePaymentStatus):
+    # @jwt_required()
+    def put(self, pesanan_id):
+        return super().put(pesanan_id)
+        
 
 # Register Protected Routes for Admin
 api.add_resource(ProtectedGetKaryawan, '/admin/karyawan')
@@ -157,6 +163,11 @@ api.add_resource(ProtectedDeletePesanan, '/admin/delete_pesanan/<string:pesanan_
 api.add_resource(ProtectedUserMenu, '/user/dashboard')
 api.add_resource(ProtectedUserAddPesanan, '/user/dashboard/order')
 api.add_resource(ProtectedGetAllPesananUser, '/user/orderhistory')
+api.add_resource(ProtectedUpdateStatusOrder, '/user/update_status/<string:pesanan_id>')
 
+
+#Payment Status
+api.add_resource(GetOrderStatus, '/user/order-status/<string:order_id>')
+api.add_resource(MidtransNotification, '/midtrans-notification-handler')
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

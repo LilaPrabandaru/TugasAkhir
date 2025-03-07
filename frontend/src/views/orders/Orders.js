@@ -225,8 +225,8 @@ const Orders = () => {
             <p>Tanggal: {formatDate(pesanan.Tanggal)}</p>
             <p>Waktu: {pesanan.Waktu}</p>
             <p style={{ 
-              color: pesanan.Status === 'Pending' ? 'red' : 
-              pesanan.Status === 'Not Paid' ? 'yellow' : 
+              color: pesanan.Status === 'Pending' ? 'yellow' : 
+              pesanan.Status === 'Not Paid' ? 'red' : 
               'green' }}>
               <b> Status: {pesanan.Status} </b>
             </p>
