@@ -15,6 +15,7 @@ import {
   CForm,
   CFormLabel,
   CFormInput,
+  CFormSelect,
   CModal,
   CModalHeader,
   CModalTitle,
@@ -27,9 +28,10 @@ import {
   CPagination,
   CPaginationItem,
   CAlert,
+  CBadge,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilPencil, cilTrash, cilCheck } from '@coreui/icons'
+import { cilPencil, cilTrash, cilCheck, cilList } from '@coreui/icons'
 import { getAllPesanan, addPesanan, updatePesanan, deletePesanan } from 'src/services/orderService'
 
 const CustomDateInput = React.forwardRef(({ value, onClick, onChange, placeholder }, ref) => (
@@ -62,12 +64,18 @@ const Orders = () => {
   const [selectedDate, setSelectedDate] = useState(null)
   const [showModalAlert, setShowModalAlert] = useState(false) // State untuk alert di modal
   const [modalAlertMessage, setModalAlertMessage] = useState('') // Pesan alert di modal
-
-  const itemsPerPage = 5
+  const [detailModal, setDetailModal] = useState(false) // Updated variable name to match your code
+  const [selectedPesanan, setSelectedPesanan] = useState(null) // State untuk menyimpan pesanan yang dipilih
+  const [itemsPerPage, setItemsPerPage] = useState(25) // Default items per page is now 25
 
   useEffect(() => {
     fetchPesanan()
   }, [])
+
+  // Reset to first page when items per page changes
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [itemsPerPage])
 
   const fetchPesanan = async () => {
     try {
@@ -183,6 +191,11 @@ const Orders = () => {
     setCurrentPage(page)
   }
 
+  // Handle items per page change
+  const handleItemsPerPageChange = (e) => {
+    setItemsPerPage(parseInt(e.target.value))
+  }
+
   const indexOfLastItem = currentPage * itemsPerPage
   const indexOfFirstItem = indexOfLastItem - itemsPerPage
   const filteredPesananList = selectedDate
@@ -202,110 +215,148 @@ const Orders = () => {
     return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })
   }
 
+  // Fungsi baru untuk menampilkan detail pesanan dalam modal
+  const showOrderDetail = (pesanan) => {
+    setSelectedPesanan(pesanan)
+    setDetailModal(true) // Updated to use detailModal instead of detailModalOpen
+  }
+
+  // Fungsi untuk mendapatkan warna status
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'Pending':
+        return 'warning'
+      case 'Not Paid':
+        return 'danger'
+      case 'Done':
+        return 'success'
+      default:
+        return 'secondary'
+    }
+  }
+
   return (
     <div>
-      <div className="d-flex justify-content-center mb-4">
-        <DatePicker
-          selected={selectedDate}
-          onChange={handleDateChange}
-          placeholderText="Filter Tanggal"
-          dateFormat="yyyy-MM-dd"
-          className="form-control"
-          minDate={new Date()}
-        />
-        <CButton color="secondary" onClick={handleClearDate} className="ms-2">
-          Clear
-        </CButton>
+      <div className="d-flex justify-content-between mb-4">
+        <div className="d-flex">
+          <DatePicker
+            selected={selectedDate}
+            onChange={handleDateChange}
+            placeholderText="Filter Tanggal"
+            dateFormat="yyyy-MM-dd"
+            className="form-control"
+            minDate={new Date()}
+          />
+          <CButton color="secondary" onClick={handleClearDate} className="ms-2">
+            Clear
+          </CButton>
+        </div>
+        <div className="d-flex align-items-center">
+          <span className="me-2">Show</span>
+          <CFormSelect
+            className="mx-2"
+            style={{ width: '100px' }}
+            value={itemsPerPage}
+            onChange={handleItemsPerPageChange}
+          >
+            <option value={25}>25</option>
+            <option value={50}>50</option>
+            <option value={75}>75</option>
+            <option value={100}>100</option>
+          </CFormSelect>
+          <span>items per page</span>
+        </div>
       </div>
 
-      {currentItems.map((pesanan) => (
-        <CCard className="mb-3" key={pesanan._id}>
-          <CCardHeader>
-            <p>Nama Pelanggan: {pesanan.Nama_Pelanggan}</p>
-            <p>Tanggal: {formatDate(pesanan.Tanggal)}</p>
-            <p>Waktu: {pesanan.Waktu}</p>
-            <p style={{ 
-              color: pesanan.Status === 'Pending' ? 'yellow' : 
-              pesanan.Status === 'Not Paid' ? 'red' : 
-              'green' }}>
-              <b> Status: {pesanan.Status} </b>
-            </p>
-          </CCardHeader>
-          <CCardBody>
-            <CAccordion className="mb-4 mt-2">
-              <CAccordionItem>
-                <CAccordionHeader>Detail Pesanan</CAccordionHeader>
-                <CAccordionBody>
-                  <CTable bordered>
-                    <CTableHead>
-                      <CTableRow>
-                        <CTableHeaderCell>Nama Menu</CTableHeaderCell>
-                        <CTableHeaderCell className="text-center">Jumlah</CTableHeaderCell>
-                        <CTableHeaderCell className="text-end">Harga</CTableHeaderCell>
-                      </CTableRow>
-                    </CTableHead>
-                    <CTableBody>
-                      {pesanan.Detail.map((item, index) => (
-                        <CTableRow key={index}>
-                          <CTableDataCell>{item['Nama Menu']}</CTableDataCell>
-                          <CTableDataCell className="text-center">{item.Jumlah}</CTableDataCell>
-                          <CTableDataCell className="text-end">
-                            {item.Harga.toLocaleString()}
-                          </CTableDataCell>
-                        </CTableRow>
-                      ))}
-                      <CTableRow>
-                        <CTableDataCell className="text-end" colSpan={2}>
-                          <h6>Total Harga:</h6>
-                        </CTableDataCell>
-                        <CTableDataCell className="text-end">
-                          <h6>Rp {pesanan['total harga'].toLocaleString()}</h6>
-                        </CTableDataCell>
-                      </CTableRow>
-                    </CTableBody>
-                  </CTable>
-                </CAccordionBody>
-              </CAccordionItem>
-            </CAccordion>
+      <CCard>
+      <CCardHeader>
+          <h5>Current Order</h5>
+        </CCardHeader>
+        <CCardBody>
+          <CTable bordered hover responsive>
+            <CTableHead>
+              <CTableRow>
+                <CTableHeaderCell width="5%">No</CTableHeaderCell>
+                <CTableHeaderCell className="text-center">Nama Pelanggan</CTableHeaderCell>
+                <CTableHeaderCell className="text-center">Tanggal</CTableHeaderCell>
+                <CTableHeaderCell className="text-center">Waktu</CTableHeaderCell>
+                <CTableHeaderCell className="text-center">Status</CTableHeaderCell>
+                <CTableHeaderCell className="text-end">Total Harga</CTableHeaderCell>
+                <CTableHeaderCell className="text-center">Detail Pesanan</CTableHeaderCell>
+                <CTableHeaderCell className="text-center">Aksi</CTableHeaderCell>
+              </CTableRow>
+            </CTableHead>
+            <CTableBody>
+              {currentItems.map((pesanan, index) => (
+                <CTableRow key={pesanan._id} vertical-align="middle">
+                  <CTableDataCell>{indexOfFirstItem + index + 1}</CTableDataCell>
+                  <CTableDataCell>{pesanan.Nama_Pelanggan}</CTableDataCell>
+                  <CTableDataCell>{formatDate(pesanan.Tanggal)}</CTableDataCell>
+                  <CTableDataCell>{pesanan.Waktu}</CTableDataCell>
+                  <CTableDataCell>
+                    <CBadge color={getStatusColor(pesanan.Status)}>{pesanan.Status}</CBadge>
+                  </CTableDataCell>
+                  <CTableDataCell className="text-end">
+                    Rp {pesanan['total harga']?.toLocaleString() || 0}
+                  </CTableDataCell>
+                  <CTableDataCell className="text-center">
+                    <CButton 
+                      color="primary" 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => showOrderDetail(pesanan)}>
+                      <CIcon icon={cilList} /> Detail
+                    </CButton>
+                  </CTableDataCell>
+                  <CTableDataCell className="text-center">
+                    <CButton color="success" size="sm" className="me-2" onClick={() => handleMarkDone(pesanan)}>
+                      <CIcon icon={cilCheck} />
+                    </CButton>
+                    <CButton color="warning" size="sm" className="me-2" onClick={() => handleEdit(pesanan)}>
+                      <CIcon icon={cilPencil} />
+                    </CButton>
+                    <CButton color="danger" size="sm" onClick={() => handleDelete(pesanan._id)}>
+                      <CIcon icon={cilTrash} />
+                    </CButton>
+                  </CTableDataCell>
+                </CTableRow>
+              ))}
+            </CTableBody>
+          </CTable>
+        </CCardBody>
+      </CCard>
 
-            {/* Tombol baru untuk mengubah status menjadi Done */}
-            <CButton color="success" className="me-2" onClick={() => handleMarkDone(pesanan)}>
-              <CIcon icon={cilCheck} />
-            </CButton>
-            <CButton color="warning" className="me-2" onClick={() => handleEdit(pesanan)}>
-              <CIcon icon={cilPencil} />
-            </CButton>
-            <CButton color="danger" onClick={() => handleDelete(pesanan._id)}>
-              <CIcon icon={cilTrash} />
-            </CButton>
-          </CCardBody>
-        </CCard>
-      ))}
-
-      <CPagination align="center" className="mt-4">
-        <CPaginationItem
-          disabled={currentPage === 1}
-          onClick={() => handlePageChange(currentPage - 1)}
-        >
-          Previous
-        </CPaginationItem>
-        {[...Array(Math.ceil(filteredPesananList.length / itemsPerPage)).keys()].map((number) => (
+      <div className="d-flex justify-content-between align-items-center mt-4">
+        <div>
+          Showing {Math.min(indexOfFirstItem + 1, filteredPesananList.length)} to {Math.min(indexOfLastItem, filteredPesananList.length)} of {filteredPesananList.length} entries
+        </div>
+        <CPagination align="center">
           <CPaginationItem
-            key={number + 1}
-            active={currentPage === number + 1}
-            onClick={() => handlePageChange(number + 1)}
+            disabled={currentPage === 1}
+            onClick={() => handlePageChange(currentPage - 1)}
           >
-            {number + 1}
+            Previous
           </CPaginationItem>
-        ))}
-        <CPaginationItem
-          disabled={currentPage === Math.ceil(filteredPesananList.length / itemsPerPage)}
-          onClick={() => handlePageChange(currentPage + 1)}
-        >
-          Next
-        </CPaginationItem>
-      </CPagination>
+          {[...Array(Math.ceil(filteredPesananList.length / itemsPerPage)).keys()].map((number) => (
+            <CPaginationItem
+              key={number + 1}
+              active={currentPage === number + 1}
+              onClick={() => handlePageChange(number + 1)}
+            >
+              {number + 1}
+            </CPaginationItem>
+          ))}
+          <CPaginationItem
+            disabled={currentPage === Math.ceil(filteredPesananList.length / itemsPerPage)}
+            onClick={() => handlePageChange(currentPage + 1)}
+          >
+            Next
+          </CPaginationItem>
+        </CPagination>
+        <div style={{width: '220px'}}></div> {/* Empty div for even spacing */}
+      </div>
 
+      {/* Modal untuk edit pesanan */}
       <CModal
         visible={modalOpen}
         onClose={() => {
@@ -399,6 +450,74 @@ const Orders = () => {
           </CButton>
           <CButton color="primary" onClick={confirmMarkDone}>
             Selesai
+          </CButton>
+        </CModalFooter>
+      </CModal>
+
+      {/* Modal untuk menampilkan detail pesanan - Updated to match your code */}
+      <CModal 
+        visible={detailModal} 
+        onClose={() => setDetailModal(false)}
+        size="lg"
+      >
+        <CModalHeader onClose={() => setDetailModal(false)}>
+          <CModalTitle>Detail Pesanan</CModalTitle>
+        </CModalHeader>
+        <CModalBody>
+          {selectedPesanan && (
+            <>
+              <div className="mb-4">
+                <div className="row">
+                  <div className="col-md-6">
+                    <p><strong>Nama Pelanggan:</strong> {selectedPesanan.Nama_Pelanggan}</p>
+                    <p><strong>Tanggal:</strong> {formatDate(selectedPesanan.Tanggal)}</p>
+                  </div>
+                  <div className="col-md-6">
+                    <p><strong>Waktu:</strong> {selectedPesanan.Waktu}</p>
+                    <p>
+                      <strong>Status:</strong> 
+                      <span className={`badge ${selectedPesanan.Status === 'Done' ? 'bg-success' : 'bg-danger'} ms-2`}>
+                        {selectedPesanan.Status}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <CTable bordered>
+                <CTableHead>
+                  <CTableRow>
+                    <CTableHeaderCell>Nama Menu</CTableHeaderCell>
+                    <CTableHeaderCell className="text-center">Jumlah</CTableHeaderCell>
+                    <CTableHeaderCell className="text-end">Harga</CTableHeaderCell>
+                  </CTableRow>
+                </CTableHead>
+                <CTableBody>
+                  {selectedPesanan.Detail.map((item, idx) => (
+                    <CTableRow key={idx}>
+                      <CTableDataCell>{item['Nama Menu']}</CTableDataCell>
+                      <CTableDataCell className="text-center">{item.Jumlah}</CTableDataCell>
+                      <CTableDataCell className="text-end">
+                        {item.Harga.toLocaleString()}
+                      </CTableDataCell>
+                    </CTableRow>
+                  ))}
+                  <CTableRow>
+                    <CTableDataCell className="text-end" colSpan={2}>
+                      <h6>Total Harga:</h6>
+                    </CTableDataCell>
+                    <CTableDataCell className="text-end">
+                      <h6>Rp{selectedPesanan['total harga'].toLocaleString()}</h6>
+                    </CTableDataCell>
+                  </CTableRow>
+                </CTableBody>
+              </CTable>
+            </>
+          )}
+        </CModalBody>
+        <CModalFooter>
+          <CButton color="secondary" onClick={() => setDetailModal(false)}>
+            Close
           </CButton>
         </CModalFooter>
       </CModal>
