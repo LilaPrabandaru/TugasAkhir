@@ -280,8 +280,8 @@ const Orders = () => {
                 <CTableHeaderCell className="text-center">Nama Pelanggan</CTableHeaderCell>
                 <CTableHeaderCell className="text-center">Tanggal</CTableHeaderCell>
                 <CTableHeaderCell className="text-center">Waktu</CTableHeaderCell>
-                <CTableHeaderCell className="text-center">Status</CTableHeaderCell>
                 <CTableHeaderCell className="text-end">Total Harga</CTableHeaderCell>
+                <CTableHeaderCell className="text-center">Status</CTableHeaderCell>
                 <CTableHeaderCell className="text-center">Detail Pesanan</CTableHeaderCell>
                 <CTableHeaderCell className="text-center">Aksi</CTableHeaderCell>
               </CTableRow>
@@ -293,12 +293,13 @@ const Orders = () => {
                   <CTableDataCell>{pesanan.Nama_Pelanggan}</CTableDataCell>
                   <CTableDataCell>{formatDate(pesanan.Tanggal)}</CTableDataCell>
                   <CTableDataCell>{pesanan.Waktu}</CTableDataCell>
-                  <CTableDataCell>
-                    <CBadge color={getStatusColor(pesanan.Status)}>{pesanan.Status}</CBadge>
-                  </CTableDataCell>
                   <CTableDataCell className="text-end">
                     Rp {pesanan['total harga']?.toLocaleString() || 0}
                   </CTableDataCell>
+                  <CTableDataCell className='text-center'>
+                    <CBadge color={getStatusColor(pesanan.Status)}>{pesanan.Status}</CBadge>
+                  </CTableDataCell>
+
                   <CTableDataCell className="text-center">
                     <CButton 
                       color="primary" 
