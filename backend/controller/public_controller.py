@@ -2,7 +2,7 @@ from flask_restful import Resource
 import json
 from flask import request, session
 from model.public import Public
-from config import MONGO_PESANAN_COLLECTION
+from config import MONGO_PESANAN_COLLECTION, MIDTRANS_SERVER_KEY
 
 public_model = Public()
 class GetMenu(Resource):
@@ -95,7 +95,7 @@ class MidtransNotification(Resource):
 
             # Verify signature
             signature = hmac.new(
-                'SB-Mid-server-X_RYyIKttvuQ_YFn0EmKCTql'.encode(),
+                MIDTRANS_SERVER_KEY.encode(),
                 f"{notification_data['order_id']}{notification_data['status_code']}{notification_data['gross_amount']}".encode(),
                 hashlib.sha512
             ).hexdigest()
