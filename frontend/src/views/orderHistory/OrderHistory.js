@@ -141,7 +141,7 @@ const OrderHistory = () => {
                 <CTableHeaderCell className="text-center">Waktu</CTableHeaderCell>
                 <CTableHeaderCell className="text-end">Total Harga</CTableHeaderCell>
                 <CTableHeaderCell className="text-center">Status</CTableHeaderCell>
-                <CTableHeaderCell width="10%" className="text-center">Action</CTableHeaderCell>
+                <CTableHeaderCell className="text-center">Detail Pesanan</CTableHeaderCell>
               </CTableRow>
             </CTableHead>
             <CTableBody>

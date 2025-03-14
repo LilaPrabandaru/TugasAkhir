@@ -19,6 +19,7 @@ import {
   CForm,
   CFormLabel,
   CFormInput,
+  CFormSelect,
 } from '@coreui/react';
 import axios from 'axios';
 import config from '../config'
@@ -31,9 +32,29 @@ const Cart = ({ cartItems, removeFromCart, clearCart }) => {
   const [paymentStatus, setPaymentStatus] = useState('Not Paid');
   const [isTimeValid, setIsTimeValid] = useState(false);
   const [tableDate, setTableDate] = useState(new Date().toISOString().split('T')[0]);
-  const [tableTime, setTableTime] = useState()
+  const [tableTime, setTableTime] = useState('');
   const [orderTotal, setOrderTotal] = useState(0);
   const [orderId, setOrderId] = useState(null);
+
+  // Generate time options from 5:00 PM to 11:00 PM in 15-minute intervals
+  const timeOptions = [];
+  for (let hour = 17; hour <= 22; hour++) {
+    for (let minute = 0; minute < 60; minute += 15) {
+      // For 11:00 PM, we only want to include exactly 11:00, not 11:15, 11:30, etc.
+      if (hour === 22 && minute > 0) continue;
+      
+      const formattedHour = hour.toString().padStart(2, '0');
+      const formattedMinute = minute.toString().padStart(2, '0');
+      const timeValue = `${formattedHour}:${formattedMinute}`;
+      
+      // Format for display (5:00 PM, 5:15 PM, etc.)
+      const displayHour = hour > 12 ? hour - 12 : hour;
+      const period = hour >= 12 ? 'PM' : 'AM';
+      const displayTime = `${displayHour}:${formattedMinute.padStart(2, '0')} ${period}`;
+      
+      timeOptions.push({ value: timeValue, label: displayTime });
+    }
+  }
 
   const userEmail = sessionStorage.getItem('email');
 
@@ -46,7 +67,6 @@ const Cart = ({ cartItems, removeFromCart, clearCart }) => {
   }, [tableTime]);
 
   const confirmPayment = async () => {
-
     console.log('Table Time:', tableTime);
     console.log('Is Time Valid:', isTimeValid);
 
@@ -243,29 +263,27 @@ const Cart = ({ cartItems, removeFromCart, clearCart }) => {
                   style={{ marginBottom: '15px', fontSize: '16px' }}
                 />
                 <CFormLabel style={{ fontSize: '16px', fontWeight: 'bold' }}>Waktu Pemesanan</CFormLabel>
-                <CFormInput
-                  type="time"
-                  value={tableTime}
-                  onChange={(e) => setTableTime(e.target.value)}
-                  style={{ marginBottom: '15px', fontSize: '16px' }}
-                />
+                <div>
+                  <CFormSelect
+                    value={tableTime}
+                    onChange={(e) => setTableTime(e.target.value)}
+                    style={{ marginBottom: '15px', fontSize: '16px' }}
+                  >
+                    <option value="">Pilih waktu</option>
+                    {timeOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </CFormSelect>
+                  <small style={{ color: '#6c757d', display: 'block', marginTop: '-10px', marginBottom: '15px' }}>
+                    Restoran buka dari jam 5:00 PM sampai 10:00 PM
+                  </small>
+                </div>
                 {!isTimeValid && (
                   <small style={{ color: 'red' }}>Waktu pemesanan wajib diisi!</small>
                 )}
               </CForm>
-              {/* <p style={{ fontSize: '18px', fontWeight: 'bold' }}>
-                Pilih Metode Pembayaran:
-              </p> */}
-              {/* <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
-                <CButton
-                  color={selectedPayment === 'QRIS' ? 'primary' : 'secondary'}
-                  className="m-1"
-                  onClick={() => setSelectedPayment('QRIS')}
-                  style={{ fontSize: '16px', padding: '10px 20px' }}
-                >
-                  QRIS
-                </CButton>
-              </div> */}
             </>
           )}
         </CModalBody>

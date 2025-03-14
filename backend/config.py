@@ -28,6 +28,5 @@ JWT_BLACKLIST_TOKEN_CHECKS = ['access', 'refresh']
 
 MONGO_URI = 'mongodb+srv://672021017:TA672021017@tugasakhir.rjawo.mongodb.net/?retryWrites=true&w=majority&appName=TugasAkhir'
 
-SERVER_KEY = 'SB-Mid-server-X_RYyIKttvuQ_YFn0EmKCTql:'
 MIDTRANS_SERVER_KEY = 'SB-Mid-server-X_RYyIKttvuQ_YFn0EmKCTql'
 MIDTRANS_CLIENT_KEY = 'SB-Mid-client-GNfvee5tAmeNzI9L'
