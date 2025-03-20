@@ -1,123 +1,141 @@
-import React, { useState, useEffect } from 'react';
-import { CContainer, CRow, CCol, CButton, CCard, CCardBody, CCardHeader } from '@coreui/react';
-import MenuTable from '../../components/MenuTable';
-import Cart from '../../components/Cart';
-import { getUserDashboard } from '../../services/publicService';
+import React, { useState, useEffect } from 'react'
+import { CContainer, CRow, CCol, CButton, CCard, CCardBody, CCardHeader } from '@coreui/react'
+import MenuTable from '../../components/MenuTable'
+import Cart from '../../components/Cart'
+import { getUserDashboard } from '../../services/publicService'
 
 const UserDashboard = () => {
-  const [menuData, setMenuData] = useState([]); // State to store raw menu data
-  const [loading, setLoading] = useState(true); // Loading state
-  const [error, setError] = useState(null); // Error state
-  const [cartItems, setCartItems] = useState([]);
-  const [isCartVisible, setIsCartVisible] = useState(false);
-  const [showSplash, setShowSplash] = useState(true); // Splash screen state
+  const [menuData, setMenuData] = useState([]) // State to store raw menu data
+  const [error, setError] = useState(null) // Error state
+  const [cartItems, setCartItems] = useState([])
+  const [isCartVisible, setIsCartVisible] = useState(false)
+  const [showSplash, setShowSplash] = useState(true) // Splash screen state
 
   // Fetch menu data from the backend
   useEffect(() => {
     const fetchMenuData = async () => {
       try {
-        const data = await getUserDashboard(); // Fetch data from /user/dashboard
-        setMenuData(data); // Store raw data
-        setLoading(false);
+        const data = await getUserDashboard() // Fetch data from /user/dashboard
+        setMenuData(data) // Store raw data
       } catch (err) {
-        setError(err.message);
-        setLoading(false);
+        setError(err.message)
       }
-    };
-    fetchMenuData();
-  }, []);
+    }
+    fetchMenuData()
+  }, [])
 
   // Add item to cart
   const addToCart = (item, quantity) => {
-    const existingItem = cartItems.find(cartItem => cartItem.id === item.id);
+    const existingItem = cartItems.find((cartItem) => cartItem.id === item.id)
     if (existingItem) {
       setCartItems(
-        cartItems.map(cartItem =>
-          cartItem.id === item.id ? { ...cartItem, quantity: cartItem.quantity + quantity } : cartItem
-        )
-      );
+        cartItems.map((cartItem) =>
+          cartItem.id === item.id
+            ? { ...cartItem, quantity: cartItem.quantity + quantity }
+            : cartItem,
+        ),
+      )
     } else {
-      setCartItems([...cartItems, { ...item, quantity }]);
+      setCartItems([...cartItems, { ...item, quantity }])
     }
-    setIsCartVisible(true); // Auto-open cart when item is added
-  };
+    setIsCartVisible(true) // Auto-open cart when item is added
+  }
 
   // Remove item from cart
-  const removeFromCart = index => {
-    const newCart = cartItems.filter((_, i) => i !== index);
-    setCartItems(newCart);
+  const removeFromCart = (index) => {
+    const newCart = cartItems.filter((_, i) => i !== index)
+    setCartItems(newCart)
 
     if (newCart.length === 0) {
-      setIsCartVisible(false); // Hide cart if empty
+      setIsCartVisible(false) // Hide cart if empty
     }
-  };
+  }
 
   // Clear cart
   const clearCart = () => {
-    console.log('Clearing cart...');
-    setCartItems([]); // Empty the cart
-    console.log('Cart closed');
-  };
+    console.log('Clearing cart...')
+    setCartItems([]) // Empty the cart
+    console.log('Cart closed')
+  }
 
   // Place order
   const placeOrder = () => {
     if (cartItems.length === 0) {
-      alert('Keranjang kosong, tambahkan item terlebih dahulu!');
-      return;
+      alert('Keranjang kosong, tambahkan item terlebih dahulu!')
+      return
     }
-    let orderDetails = '📜 **Pesanan Anda:**\n\n';
-    cartItems.forEach(item => {
-      orderDetails += `• ${item.name} - ${item.quantity} pcs (Rp ${(item.price * item.quantity).toLocaleString()})\n`;
-    });
-    alert(orderDetails + '\n✅ Pesanan berhasil dibuat!');
-    setCartItems([]);
-    setIsCartVisible(false);
-  };
+    let orderDetails = '📜 **Pesanan Anda:**\n\n'
+    cartItems.forEach((item) => {
+      orderDetails += `• ${item.name} - ${item.quantity} pcs (Rp ${(item.price * item.quantity).toLocaleString()})\n`
+    })
+    alert(orderDetails + '\n✅ Pesanan berhasil dibuat!')
+    setCartItems([])
+    setIsCartVisible(false)
+  }
 
   // Group menu items by Kategori
   const groupedMenuItems = menuData.reduce((acc, item) => {
-    const category = item.Kategori || 'Lainnya'; // Default category if Kategori is missing
+    const category = item.Kategori || 'Lainnya' // Default category if Kategori is missing
     if (!acc[category]) {
-      acc[category] = [];
+      acc[category] = []
     }
     acc[category].push({
       id: item._id,
       name: item.Nama,
       price: item.Harga,
-    });
-    return acc;
-  }, {});
-
-  // Handle loading and error states
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+    })
+    return acc
+  }, {})
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return <div>Error: {error}</div>
   }
 
   if (showSplash) {
     return (
-      <div style={{
-        display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center',
-        height: '100vh', textAlign: 'center', backgroundColor: '#f8f9fa'
-      }}>
-        <img src="/path-to-restaurant-image.jpg" alt="Restaurant" style={{ width: '80%', maxWidth: '400px', borderRadius: '10px' }} />
-        <CButton color="primary" size="lg" style={{ marginTop: '20px' }} onClick={() => setShowSplash(false)}>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+          textAlign: 'center',
+          backgroundColor: '#f8f9fa',
+        }}
+      >
+        <img
+          src="/path-to-restaurant-image.jpg"
+          alt="Restaurant"
+          style={{ width: '80%', maxWidth: '400px', borderRadius: '10px' }}
+        />
+        <CButton
+          color="primary"
+          size="lg"
+          style={{ marginTop: '20px' }}
+          onClick={() => setShowSplash(false)}
+        >
           See the Menu
         </CButton>
       </div>
-    );
+    )
   }
 
   return (
     <CContainer>
-      <h2 style={{ textAlign: 'center' }}>Menu Makanan</h2>
+      <CRow className="justify-content-center">
+        <CCol xs={12}>
+          <h2 className="text-center">Menu Makanan</h2>
+        </CCol>
+      </CRow>
       {/* Render grouped menu items */}
       {Object.keys(groupedMenuItems).map((category) => (
-        <CCard key={category} className="mb-4">
-          <CCardHeader>{category}</CCardHeader>
+        <CCard key={category} className="mb-3">
+          <CCardHeader>
+            <h3>
+              <strong>{category}</strong>
+            </h3>
+          </CCardHeader>
           <CCardBody>
             <MenuTable menuItems={groupedMenuItems[category]} addToCart={addToCart} />
           </CCardBody>
@@ -160,6 +178,6 @@ const UserDashboard = () => {
       )}
     </CContainer>
   )
-};
+}
 
-export default UserDashboard;
+export default UserDashboard

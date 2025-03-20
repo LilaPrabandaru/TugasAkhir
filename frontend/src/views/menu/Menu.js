@@ -1,23 +1,25 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import {
+  CContainer,
+  CRow,
+  CCol,
   CCard,
-  CCardHeader,
   CCardBody,
-  CButton,
-  CModal,
-  CModalTitle,
-  CModalHeader,
-  CModalBody,
-  CModalFooter,
   CFormInput,
-  CFormSelect,
-  CAlert,
+  CButton,
   CTable,
   CTableHead,
   CTableRow,
   CTableHeaderCell,
   CTableBody,
   CTableDataCell,
+  CModal,
+  CModalHeader,
+  CModalTitle,
+  CModalBody,
+  CModalFooter,
+  CAlert,
+  CFormSelect,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilPencil, cilTrash, cilSearch } from '@coreui/icons'
@@ -154,75 +156,87 @@ const Menu = () => {
   }, {})
 
   return (
-    <div>
-      <h2 style={{ textAlign: 'center' }}>Daftar Menu</h2>
+    <CContainer>
+      <CRow className="justify-content-center">
+        <CCol xs={12}>
+          <h2 className="text-center">
+            Daftar Menu
+          </h2>
+        </CCol>
+      </CRow>
+
       {/* Search Bar */}
-      <div className="mb-3 d-flex justify-content-between align-items-center">
-        <CFormInput
-          placeholder="Cari Menu..."
-          value={searchQuery}
-          onChange={handleSearch}
-          style={{ width: '88%' }}
-        />
-        <CButton onClick={() => setModalVisible(true)} color="primary">
-          Tambah Menu
-        </CButton>
-      </div>
+      <CRow className="mb-3 align-items-center">
+        <CCol xs={10}>
+          <CFormInput placeholder="Cari Menu..." value={searchQuery} onChange={handleSearch} />
+        </CCol>
+        <CCol xs={2} className="text-end">
+          <CButton onClick={() => setModalVisible(true)} color="primary">
+            Tambah Menu
+          </CButton>
+        </CCol>
+      </CRow>
+
       <CCard className="shadow-sm">
         <CCardBody>
           {Object.keys(groupedMenuData).map((kategori) => (
-            <div key={kategori} className="mb-3">
-              <h3>
-                <b>{kategori}</b>
-              </h3>
-              <CTable bordered hover responsive className="table table-striped">
-                <CTableHead>
-                  <CTableRow>
-                    <CTableHeaderCell style={{ width: '45%', textAlign: 'center' }}>
-                      Nama Menu
-                    </CTableHeaderCell>
-                    <CTableHeaderCell style={{ width: '20%', textAlign: 'right' }}>
-                      Harga
-                    </CTableHeaderCell>
-                    <CTableHeaderCell style={{ width: '15%', textAlign: 'center' }}>
-                      Tipe
-                    </CTableHeaderCell>
-                    <CTableHeaderCell style={{ width: '10%', textAlign: 'center' }}>
-                      Aksi
-                    </CTableHeaderCell>
-                  </CTableRow>
-                </CTableHead>
-                <CTableBody>
-                  {groupedMenuData[kategori].map((menu) => (
-                    <CTableRow key={menu._id}>
-                      <CTableDataCell style={{ width: '45%', textAlign: 'left' }}>
-                        {menu.Nama}
-                      </CTableDataCell>
-                      <CTableDataCell style={{ width: '20%', textAlign: 'right' }}>
-                        Rp{menu.Harga.toLocaleString()}
-                      </CTableDataCell>
-                      <CTableDataCell style={{ width: '15%', textAlign: 'center' }}>
-                        {menu.Tipe}
-                      </CTableDataCell>
-                      <CTableDataCell style={{ width: '10%', textAlign: 'center' }}>
-                        <CButton
-                          onClick={() => handleOpenUpdateModal(menu)}
-                          className="btn-warning me-2"
-                        >
-                          <CIcon icon={cilPencil} />
-                        </CButton>
-                        <CButton
-                          onClick={() => handleOpenConfirmDeleteModal(menu._id)}
-                          className="btn-danger"
-                        >
-                          <CIcon icon={cilTrash} />
-                        </CButton>
-                      </CTableDataCell>
+            <CRow key={kategori} className="mb-3">
+              <CCol xs={12}>
+                <h3>
+                  <strong>{kategori}</strong>
+                </h3>
+              </CCol>
+              <CCol xs={12}>
+                <CTable bordered hover responsive striped>
+                  <CTableHead>
+                    <CTableRow>
+                      <CTableHeaderCell style={{ width: '45%', textAlign: 'center' }}>
+                        Nama Menu
+                      </CTableHeaderCell>
+                      <CTableHeaderCell style={{ width: '20%', textAlign: 'right' }}>
+                        Harga
+                      </CTableHeaderCell>
+                      <CTableHeaderCell style={{ width: '15%', textAlign: 'center' }}>
+                        Tipe
+                      </CTableHeaderCell>
+                      <CTableHeaderCell style={{ width: '10%', textAlign: 'center' }}>
+                        Aksi
+                      </CTableHeaderCell>
                     </CTableRow>
-                  ))}
-                </CTableBody>
-              </CTable>
-            </div>
+                  </CTableHead>
+                  <CTableBody>
+                    {groupedMenuData[kategori].map((menu) => (
+                      <CTableRow key={menu._id}>
+                        <CTableDataCell style={{ width: '45%', textAlign: 'left' }}>
+                          {menu.Nama}
+                        </CTableDataCell>
+                        <CTableDataCell style={{ width: '20%', textAlign: 'right' }}>
+                          Rp{menu.Harga.toLocaleString()}
+                        </CTableDataCell>
+                        <CTableDataCell style={{ width: '15%', textAlign: 'center' }}>
+                          {menu.Tipe}
+                        </CTableDataCell>
+                        <CTableDataCell style={{ width: '10%', textAlign: 'center' }}>
+                          <CButton
+                            onClick={() => handleOpenUpdateModal(menu)}
+                            color="warning"
+                            className="me-2"
+                          >
+                            <CIcon icon={cilPencil} />
+                          </CButton>
+                          <CButton
+                            onClick={() => handleOpenConfirmDeleteModal(menu._id)}
+                            color="danger"
+                          >
+                            <CIcon icon={cilTrash} />
+                          </CButton>
+                        </CTableDataCell>
+                      </CTableRow>
+                    ))}
+                  </CTableBody>
+                </CTable>
+              </CCol>
+            </CRow>
           ))}
         </CCardBody>
       </CCard>
@@ -255,22 +269,22 @@ const Menu = () => {
             onChange={(e) => setNewMenu({ ...newMenu, Tipe: e.target.value })}
             className="mb-3"
           >
-            <option>Pilih Tipe</option>
-            <option>Makanan</option>
-            <option>Minuman</option>
+            <option value="">Pilih Tipe</option>
+            <option value="Makanan">Makanan</option>
+            <option value="Minuman">Minuman</option>
           </CFormSelect>
           <CFormSelect
             value={newMenu.Kategori}
             onChange={(e) => setNewMenu({ ...newMenu, Kategori: e.target.value })}
             className="mb-3"
           >
-            <option>Pilih Kategori</option>
-            <option>Ayam</option>
-            <option>Steak Original & Crispy</option>
-            <option>Spesial Nasi Goreng</option>
-            <option>Pelengkap</option>
-            <option>Menu Baru</option>
-            <option>Minuman Es/Panas</option>
+            <option value="">Pilih Kategori</option>
+            <option value="Ayam">Ayam</option>
+            <option value="Steak Original & Crispy">Steak Original & Crispy</option>
+            <option value="Spesial Nasi Goreng">Spesial Nasi Goreng</option>
+            <option value="Pelengkap">Pelengkap</option>
+            <option value="Menu Baru">Menu Baru</option>
+            <option value="Minuman Es/Panas">Minuman Es/Panas</option>
           </CFormSelect>
         </CModalBody>
         <CModalFooter>
@@ -311,20 +325,20 @@ const Menu = () => {
             onChange={(e) => setNewMenu({ ...newMenu, Tipe: e.target.value })}
             className="mb-3"
           >
-            <option>Pilih Tipe</option>
-            <option>Makanan</option>
-            <option>Minuman</option>
+            <option value="">Pilih Tipe</option>
+            <option value="Makanan">Makanan</option>
+            <option value="Minuman">Minuman</option>
           </CFormSelect>
           <CFormSelect
             value={newMenu.Kategori}
             onChange={(e) => setNewMenu({ ...newMenu, Kategori: e.target.value })}
             className="mb-3"
           >
-            <option>Pilih Kategori</option>
-            <option>Ayam</option>
-            <option>Steak</option>
-            <option>Nasi Goreng</option>
-            <option>Minuman</option>
+            <option value="">Pilih Kategori</option>
+            <option value="Ayam">Ayam</option>
+            <option value="Steak">Steak</option>
+            <option value="Nasi Goreng">Nasi Goreng</option>
+            <option value="Minuman">Minuman</option>
           </CFormSelect>
         </CModalBody>
         <CModalFooter>
@@ -352,7 +366,7 @@ const Menu = () => {
           </CButton>
         </CModalFooter>
       </CModal>
-    </div>
+    </CContainer>
   )
 }
 

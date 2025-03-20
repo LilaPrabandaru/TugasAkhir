@@ -1,6 +1,17 @@
 import React, { useState } from 'react'
 import CIcon from '@coreui/icons-react'
-import { cilChartLine, cilCash, cilSpeedometer, cilUser, cilClipboard, cilFastfood, cilAccountLogout, cilHistory, cilChevronBottom, cilChevronTop } from '@coreui/icons'
+import {
+  cilChartLine,
+  cilCash,
+  cilSpeedometer,
+  cilUser,
+  cilClipboard,
+  cilFastfood,
+  cilAccountLogout,
+  cilHistory,
+  cilChevronBottom,
+  cilChevronTop,
+} from '@coreui/icons'
 import { CNavItem, CNavTitle, CNavGroup } from '@coreui/react'
 
 // Ambil role dari sessionStorage

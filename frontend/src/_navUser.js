@@ -1,6 +1,13 @@
 import React from 'react'
 import CIcon from '@coreui/icons-react'
-import { cilSpeedometer, cilAccountLogout, cilHistory } from '@coreui/icons'
+import {
+  cilSpeedometer,
+  cilAccountLogout,
+  cilHistory,
+  cilMenu,
+  cilList,
+  cilFastfood,
+} from '@coreui/icons'
 import { CNavItem, CNavTitle } from '@coreui/react'
 
 // Ambil role dari sessionStorage
@@ -9,9 +16,9 @@ const userRole = sessionStorage.getItem('user_role')
 const menuItems = [
   {
     component: CNavItem,
-    name: 'Dashboard',
+    name: 'Menu',
     to: '/user/dashboard',
-    icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilFastfood} customClassName="nav-icon" />,
   },
 ]
 

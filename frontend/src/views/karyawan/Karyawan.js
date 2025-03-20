@@ -2,24 +2,27 @@ import React, { useState, useEffect } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import {
+  CContainer,
+  CRow,
+  CCol,
+  CButton,
+  CCard,
+  CCardHeader,
+  CCardBody,
   CTable,
   CTableHead,
   CTableRow,
   CTableHeaderCell,
   CTableBody,
   CTableDataCell,
-  CButton,
   CModal,
   CModalHeader,
   CModalTitle,
   CModalBody,
   CModalFooter,
+  CAlert,
   CForm,
   CFormInput,
-  CCard,
-  CCardHeader,
-  CCardBody,
-  CAlert,
 } from '@coreui/react'
 import {
   getKaryawan,
@@ -151,47 +154,61 @@ const Karyawan = () => {
   }
 
   return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
-        <CButton color="primary" onClick={() => handleOpenModal()}>
-          Tambah Karyawan
-        </CButton>
-      </div>
-      <CTable bordered hover responsive className="table table-striped">
-        <CTableHead>
-          <CTableRow>
-            <CTableHeaderCell style={{ width: '30%', textAlign: 'center' }}>Email</CTableHeaderCell>
-            <CTableHeaderCell style={{ width: '20%', textAlign: 'center' }}>
-              Nama Lengkap
-            </CTableHeaderCell>
-            <CTableHeaderCell style={{ width: '20%', textAlign: 'center' }}>
-              Nomor Telpon
-            </CTableHeaderCell>
-            <CTableHeaderCell style={{ width: '20%', textAlign: 'center' }}>
-              Tanggal Lahir
-            </CTableHeaderCell>
-            <CTableHeaderCell style={{ width: '10%', textAlign: 'center' }}>Aksi</CTableHeaderCell>
-          </CTableRow>
-        </CTableHead>
-        <CTableBody>
-          {karyawanData.map((karyawan) => (
-            <CTableRow key={karyawan._id}>
-              <CTableDataCell>{karyawan.Email}</CTableDataCell>
-              <CTableDataCell>{karyawan.Nama_Lengkap}</CTableDataCell>
-              <CTableDataCell>{karyawan.Nomor_Telp}</CTableDataCell>
-              <CTableDataCell>{formatDate(karyawan.Tanggal_Lahir)}</CTableDataCell>
-              <CTableDataCell>
-                <CButton color="warning" onClick={() => handleOpenModal(karyawan)}>
-                  <CIcon icon={cilPencil} />
-                </CButton>{' '}
-                <CButton color="danger" onClick={() => handleOpenDeleteModal(karyawan._id)}>
-                  <CIcon icon={cilTrash} />
-                </CButton>
-              </CTableDataCell>
-            </CTableRow>
-          ))}
-        </CTableBody>
-      </CTable>
+    <CContainer>
+      <CRow className="mb-3">
+        <CCol className="text-end">
+          <CButton color="primary" onClick={() => handleOpenModal()}>
+            Tambah Karyawan
+          </CButton>
+        </CCol>
+      </CRow>
+
+      <CCard className="shadow-sm mb-4">
+        <CCardHeader>
+          <h5>Daftar Karyawan</h5>
+        </CCardHeader>
+        <CCardBody>
+          <CTable bordered hover responsive striped>
+            <CTableHead>
+              <CTableRow>
+                <CTableHeaderCell style={{ width: '30%', textAlign: 'center' }}>
+                  Email
+                </CTableHeaderCell>
+                <CTableHeaderCell style={{ width: '20%', textAlign: 'center' }}>
+                  Nama Lengkap
+                </CTableHeaderCell>
+                <CTableHeaderCell style={{ width: '20%', textAlign: 'center' }}>
+                  Nomor Telpon
+                </CTableHeaderCell>
+                <CTableHeaderCell style={{ width: '20%', textAlign: 'center' }}>
+                  Tanggal Lahir
+                </CTableHeaderCell>
+                <CTableHeaderCell style={{ width: '10%', textAlign: 'center' }}>
+                  Aksi
+                </CTableHeaderCell>
+              </CTableRow>
+            </CTableHead>
+            <CTableBody>
+              {karyawanData.map((karyawan) => (
+                <CTableRow key={karyawan._id}>
+                  <CTableDataCell>{karyawan.Email}</CTableDataCell>
+                  <CTableDataCell>{karyawan.Nama_Lengkap}</CTableDataCell>
+                  <CTableDataCell>{karyawan.Nomor_Telp}</CTableDataCell>
+                  <CTableDataCell>{formatDate(karyawan.Tanggal_Lahir)}</CTableDataCell>
+                  <CTableDataCell>
+                    <CButton color="warning" onClick={() => handleOpenModal(karyawan)}>
+                      <CIcon icon={cilPencil} />
+                    </CButton>{' '}
+                    <CButton color="danger" onClick={() => handleOpenDeleteModal(karyawan._id)}>
+                      <CIcon icon={cilTrash} />
+                    </CButton>
+                  </CTableDataCell>
+                </CTableRow>
+              ))}
+            </CTableBody>
+          </CTable>
+        </CCardBody>
+      </CCard>
 
       {/* Modal untuk Tambah/Update */}
       <CModal visible={modal} onClose={handleCloseUpdateModal}>
@@ -220,27 +237,32 @@ const Karyawan = () => {
               value={newKaryawan.Nomor_Telp}
               onChange={(e) => setnewKaryawan({ ...newKaryawan, Nomor_Telp: e.target.value })}
             />
-            <label className="form-label">Tanggal Lahir</label>
-            <div className="d-flex align-items-center">
-              {/* DatePicker dengan custom input CFormInput */}
-              <DatePicker
-                selected={newKaryawan.Tanggal_Lahir ? new Date(newKaryawan.Tanggal_Lahir) : null}
-                onChange={(date) =>
-                  setnewKaryawan({
-                    ...newKaryawan,
-                    Tanggal_Lahir: date ? date.toISOString().split('T')[0] : '',
-                  })
-                }
-                dateFormat="yyyy-MM-dd"
-                showYearDropdown
-                scrollableYearDropdown
-                yearDropdownItemNumber={100}
-                customInput={<CustomDateInput />}
-              />
-              <CButton color="secondary" size="sm" className="ms-2" onClick={handleClearDate}>
-                Clear
-              </CButton>
-            </div>
+            <CRow className="mb-3">
+              <CCol xs={12}>
+                <label className="form-label">Tanggal Lahir</label>
+              </CCol>
+              <CCol xs={9}>
+                <DatePicker
+                  selected={newKaryawan.Tanggal_Lahir ? new Date(newKaryawan.Tanggal_Lahir) : null}
+                  onChange={(date) =>
+                    setnewKaryawan({
+                      ...newKaryawan,
+                      Tanggal_Lahir: date ? date.toISOString().split('T')[0] : '',
+                    })
+                  }
+                  dateFormat="yyyy-MM-dd"
+                  showYearDropdown
+                  scrollableYearDropdown
+                  yearDropdownItemNumber={100}
+                  customInput={<CustomDateInput />}
+                />
+              </CCol>
+              <CCol xs={3}>
+                <CButton color="secondary" size="sm" onClick={handleClearDate}>
+                  Clear
+                </CButton>
+              </CCol>
+            </CRow>
           </CForm>
         </CModalBody>
         <CModalFooter>
@@ -268,7 +290,7 @@ const Karyawan = () => {
           </CButton>
         </CModalFooter>
       </CModal>
-    </div>
+    </CContainer>
   )
 }
 

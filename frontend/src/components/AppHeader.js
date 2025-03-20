@@ -60,9 +60,9 @@ const AppHeader = () => {
         </CHeaderNav>
 
         <CHeaderNav>
-          <li className="nav-item py-1">
+          <CNavItem className="py-1">
             <div className="vr h-100 mx-2 text-body text-opacity-75"></div>
-          </li>
+          </CNavItem>
           <CDropdown variant="nav-item" placement="bottom-end">
             <CDropdownToggle caret={false}>
               {colorMode === 'dark' ? (
@@ -103,12 +103,12 @@ const AppHeader = () => {
               </CDropdownItem>
             </CDropdownMenu>
           </CDropdown>
-          <li className="nav-item py-1">
+          <CNavItem className="py-1">
             <div className="vr h-100 mx-2 text-body text-opacity-75"></div>
-          </li>
-          <div className="d-flex align-items-center ms-auto">
-            {currentDate}
-          </div>
+          </CNavItem>
+          <CNavItem className="ms-auto d-flex align-items-center">
+            <span>{currentDate}</span>
+          </CNavItem>
           <AppHeaderDropdown />
         </CHeaderNav>
       </CContainer>

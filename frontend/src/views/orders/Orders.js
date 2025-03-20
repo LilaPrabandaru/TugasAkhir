@@ -1,37 +1,44 @@
 import React, { useState, useEffect } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
+import ID from 'date-fns/locale/id'
 import {
+  CContainer,
+  CRow,
+  CCol,
+  CButton,
   CCard,
-  CCardBody,
   CCardHeader,
+  CCardBody,
   CTable,
   CTableHead,
   CTableRow,
   CTableHeaderCell,
   CTableBody,
   CTableDataCell,
-  CButton,
-  CForm,
-  CFormLabel,
-  CFormInput,
-  CFormSelect,
+  CPagination,
+  CPaginationItem,
   CModal,
   CModalHeader,
   CModalTitle,
   CModalBody,
   CModalFooter,
-  CAccordion,
-  CAccordionItem,
-  CAccordionHeader,
-  CAccordionBody,
-  CPagination,
-  CPaginationItem,
-  CAlert,
+  CFormSelect,
+  CForm,
+  CFormInput,
+  CFormLabel,
   CBadge,
+  CAlert,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilPencil, cilTrash, cilCheck, cilList } from '@coreui/icons'
+import {
+  cilPencil,
+  cilTrash,
+  cilCheck,
+  cilList,
+  cilChevronRight,
+  cilChevronLeft,
+} from '@coreui/icons'
 import { getAllPesanan, addPesanan, updatePesanan, deletePesanan } from 'src/services/orderService'
 
 const CustomDateInput = React.forwardRef(({ value, onClick, onChange, placeholder }, ref) => (
@@ -62,40 +69,33 @@ const Orders = () => {
   const [pesananToDone, setPesananToDone] = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
   const [selectedDate, setSelectedDate] = useState(null)
-  const [showModalAlert, setShowModalAlert] = useState(false) // State untuk alert di modal
-  const [modalAlertMessage, setModalAlertMessage] = useState('') // Pesan alert di modal
-  const [detailModal, setDetailModal] = useState(false) // Updated variable name to match your code
-  const [selectedPesanan, setSelectedPesanan] = useState(null) // State untuk menyimpan pesanan yang dipilih
-  const [itemsPerPage, setItemsPerPage] = useState(25) // Default items per page is now 25
+  const [showModalAlert, setShowModalAlert] = useState(false)
+  const [modalAlertMessage, setModalAlertMessage] = useState('')
+  const [detailModal, setDetailModal] = useState(false)
+  const [selectedPesanan, setSelectedPesanan] = useState(null)
+  const [itemsPerPage, setItemsPerPage] = useState(25)
 
   useEffect(() => {
     fetchPesanan()
   }, [])
 
-  // Reset to first page when items per page changes
+  // Reset halaman saat jumlah item per page berubah
   useEffect(() => {
     setCurrentPage(1)
   }, [itemsPerPage])
 
   const fetchPesanan = async () => {
     try {
-      const data = await getAllPesanan();
-      console.log('Data pesanan yang didapat:', data);
-  
-      // Filter only pending orders
-      const filteredData = data.filter((pesanan) => pesanan.Status === 'Pending' || pesanan.Status === 'Not Paid');
-  
-      // Sort by the newest date (Tanggal)
-      const sortedData = filteredData.sort((a, b) => {
-        const dateA = new Date(a.Tanggal);
-        const dateB = new Date(b.Tanggal);
-        return dateB - dateA; // Descending order (newest first)
-      });
-  
-      console.log('Data pesanan yang difilter dan diurutkan:', sortedData);
-      setPesananList(sortedData); // Update state with sorted data
+      const data = await getAllPesanan()
+      // Filter hanya pesanan dengan status Pending atau Not Paid
+      const filteredData = data.filter(
+        (pesanan) => pesanan.Status === 'Pending' || pesanan.Status === 'Not Paid',
+      )
+      // Urutkan berdasarkan tanggal terbaru
+      const sortedData = filteredData.sort((a, b) => new Date(b.Tanggal) - new Date(a.Tanggal))
+      setPesananList(sortedData)
     } catch (error) {
-      console.error('Error fetching pesanan:', error);
+      console.error('Error fetching pesanan:', error)
     }
   }
 
@@ -118,9 +118,23 @@ const Orders = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    // Validasi: Pastikan semua field diisi
+    if (
+      !formData.Nama_Pelanggan ||
+      !formData.Tanggal ||
+      !formData.Waktu ||
+      !formData.Status ||
+      (Array.isArray(formData.Detail) && formData.Detail.length === 0)
+    ) {
+      setModalAlertMessage('Semua field harus diisi')
+      setShowModalAlert(true)
+      return
+    }
 
+    // Cek apakah ada perubahan saat update
     const selectedPesanan = pesananList.find((pesanan) => pesanan._id === selectedPesananId)
     const isSame =
+      selectedPesanan &&
       selectedPesanan.Nama_Pelanggan === formData.Nama_Pelanggan &&
       selectedPesanan.Tanggal === formData.Tanggal &&
       selectedPesanan.Waktu === formData.Waktu &&
@@ -137,10 +151,10 @@ const Orders = () => {
       if (editMode) {
         await updatePesanan(selectedPesananId, formData)
       } else {
-        const newPesanan = await addPesanan(formData) // Simpan pesanan yang baru ditambahkan
-        setPesananList([...pesananList, newPesanan]) // Tambahkan ke state pesananList
+        const newPesanan = await addPesanan(formData)
+        setPesananList([...pesananList, newPesanan])
       }
-      fetchPesanan() // Pastikan tetap ambil data terbaru
+      fetchPesanan()
       setModalOpen(false)
     } catch (error) {
       console.error('Error saving pesanan:', error)
@@ -191,23 +205,41 @@ const Orders = () => {
     setCurrentPage(page)
   }
 
-  // Handle items per page change
   const handleItemsPerPageChange = (e) => {
     setItemsPerPage(parseInt(e.target.value))
   }
 
   const indexOfLastItem = currentPage * itemsPerPage
   const indexOfFirstItem = indexOfLastItem - itemsPerPage
+  // Jika selectedDate ada, filter berdasarkan tanggal dan urutkan berdasarkan waktu,
+  // jika tidak, urutkan berdasarkan tanggal ascending dan jika tanggal sama, urutkan berdasarkan waktu ascending
   const filteredPesananList = selectedDate
-    ? pesananList.filter((pesanan) => {
-        const pesananDate = new Date(pesanan.Tanggal)
-        return (
-          pesananDate.getFullYear() === selectedDate.getFullYear() &&
-          pesananDate.getMonth() === selectedDate.getMonth() &&
-          pesananDate.getDate() === selectedDate.getDate()
-        )
+    ? pesananList
+        .filter((pesanan) => {
+          const pesananDate = new Date(pesanan.Tanggal)
+          return (
+            pesananDate.getFullYear() === selectedDate.getFullYear() &&
+            pesananDate.getMonth() === selectedDate.getMonth() &&
+            pesananDate.getDate() === selectedDate.getDate()
+          )
+        })
+        .sort((a, b) => {
+          const timeA = new Date(`1970-01-01T${a.Waktu}:00`)
+          const timeB = new Date(`1970-01-01T${b.Waktu}:00`)
+          return timeA - timeB
+        })
+    : pesananList.slice().sort((a, b) => {
+        const dateA = new Date(a.Tanggal)
+        const dateB = new Date(b.Tanggal)
+        // Jika tanggal sama, bandingkan waktu
+        if (dateA.getTime() === dateB.getTime()) {
+          const timeA = new Date(`1970-01-01T${a.Waktu}:00`)
+          const timeB = new Date(`1970-01-01T${b.Waktu}:00`)
+          return timeA - timeB
+        }
+        return dateA - dateB
       })
-    : pesananList
+
   const currentItems = filteredPesananList.slice(indexOfFirstItem, indexOfLastItem)
   const formatDate = (dateStr) => {
     if (!dateStr) return ''
@@ -215,13 +247,11 @@ const Orders = () => {
     return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })
   }
 
-  // Fungsi baru untuk menampilkan detail pesanan dalam modal
   const showOrderDetail = (pesanan) => {
     setSelectedPesanan(pesanan)
-    setDetailModal(true) // Updated to use detailModal instead of detailModalOpen
+    setDetailModal(true)
   }
 
-  // Fungsi untuk mendapatkan warna status
   const getStatusColor = (status) => {
     switch (status) {
       case 'Pending':
@@ -236,23 +266,30 @@ const Orders = () => {
   }
 
   return (
-    <div>
-      <div className="d-flex justify-content-between mb-4">
-        <div className="d-flex">
-          <DatePicker
-            selected={selectedDate}
-            onChange={handleDateChange}
-            placeholderText="Filter Tanggal"
-            dateFormat="yyyy-MM-dd"
-            className="form-control"
-            minDate={new Date()}
-          />
-          <CButton color="secondary" onClick={handleClearDate} className="ms-2">
-            Clear
-          </CButton>
-        </div>
-        <div className="d-flex align-items-center">
-          <span className="me-2">Show</span>
+    <CContainer>
+      {/* Filter Tanggal dan Items per Page */}
+      <CRow className="mb-4" alignItems="center">
+        <CCol md={6}>
+          <CRow>
+            <CCol xs={9} className="w-auto">
+              <DatePicker
+                locale={ID}
+                selected={selectedDate}
+                onChange={handleDateChange}
+                placeholderText="Filter Tanggal"
+                dateFormat="dd MMMM yyyy"
+                className="form-control"
+              />
+            </CCol>
+            <CCol xs={3}>
+              <CButton color="secondary" onClick={handleClearDate}>
+                Clear
+              </CButton>
+            </CCol>
+          </CRow>
+        </CCol>
+        <CCol md={6} className="d-flex justify-content-end align-items-center">
+          <CFormLabel className="me-2">Show</CFormLabel>
           <CFormSelect
             className="mx-2"
             style={{ width: '100px' }}
@@ -264,12 +301,13 @@ const Orders = () => {
             <option value={75}>75</option>
             <option value={100}>100</option>
           </CFormSelect>
-          <span>items per page</span>
-        </div>
-      </div>
+          <CFormLabel>items per page</CFormLabel>
+        </CCol>
+      </CRow>
 
+      {/* Tabel Order di dalam Card */}
       <CCard>
-      <CCardHeader>
+        <CCardHeader>
           <h5>Current Order</h5>
         </CCardHeader>
         <CCardBody>
@@ -296,24 +334,34 @@ const Orders = () => {
                   <CTableDataCell className="text-end">
                     Rp {pesanan['total harga']?.toLocaleString() || 0}
                   </CTableDataCell>
-                  <CTableDataCell className='text-center'>
+                  <CTableDataCell className="text-center">
                     <CBadge color={getStatusColor(pesanan.Status)}>{pesanan.Status}</CBadge>
                   </CTableDataCell>
-
                   <CTableDataCell className="text-center">
-                    <CButton 
-                      color="primary" 
-                      size="sm" 
+                    <CButton
+                      color="primary"
+                      size="sm"
                       variant="outline"
-                      onClick={() => showOrderDetail(pesanan)}>
+                      onClick={() => showOrderDetail(pesanan)}
+                    >
                       <CIcon icon={cilList} /> Detail
                     </CButton>
                   </CTableDataCell>
                   <CTableDataCell className="text-center">
-                    <CButton color="success" size="sm" className="me-2" onClick={() => handleMarkDone(pesanan)}>
+                    <CButton
+                      color="success"
+                      size="sm"
+                      className="me-2"
+                      onClick={() => handleMarkDone(pesanan)}
+                    >
                       <CIcon icon={cilCheck} />
                     </CButton>
-                    <CButton color="warning" size="sm" className="me-2" onClick={() => handleEdit(pesanan)}>
+                    <CButton
+                      color="warning"
+                      size="sm"
+                      className="me-2"
+                      onClick={() => handleEdit(pesanan)}
+                    >
                       <CIcon icon={cilPencil} />
                     </CButton>
                     <CButton color="danger" size="sm" onClick={() => handleDelete(pesanan._id)}>
@@ -327,49 +375,59 @@ const Orders = () => {
         </CCardBody>
       </CCard>
 
-      <div className="d-flex justify-content-between align-items-center mt-4">
-        <div>
-          Showing {Math.min(indexOfFirstItem + 1, filteredPesananList.length)} to {Math.min(indexOfLastItem, filteredPesananList.length)} of {filteredPesananList.length} entries
-        </div>
-        <CPagination align="center">
-          <CPaginationItem
-            disabled={currentPage === 1}
-            onClick={() => handlePageChange(currentPage - 1)}
-          >
-            Previous
-          </CPaginationItem>
-          {[...Array(Math.ceil(filteredPesananList.length / itemsPerPage)).keys()].map((number) => (
+      {/* Pagination */}
+      <CRow className="mt-4 align-items-center">
+        <CCol md={4}>
+          <p>
+            Showing {Math.min(indexOfFirstItem + 1, filteredPesananList.length)} to{' '}
+            {Math.min(indexOfLastItem, filteredPesananList.length)} of {filteredPesananList.length}{' '}
+            entries
+          </p>
+        </CCol>
+        <CCol md={4} className="text-center">
+          <CPagination align="center">
             <CPaginationItem
-              key={number + 1}
-              active={currentPage === number + 1}
-              onClick={() => handlePageChange(number + 1)}
+              disabled={currentPage === 1}
+              onClick={() => handlePageChange(currentPage - 1)}
             >
-              {number + 1}
+              <CIcon icon={cilChevronLeft} />
             </CPaginationItem>
-          ))}
-          <CPaginationItem
-            disabled={currentPage === Math.ceil(filteredPesananList.length / itemsPerPage)}
-            onClick={() => handlePageChange(currentPage + 1)}
-          >
-            Next
-          </CPaginationItem>
-        </CPagination>
-        <div style={{width: '220px'}}></div> {/* Empty div for even spacing */}
-      </div>
+            {[...Array(Math.ceil(filteredPesananList.length / itemsPerPage)).keys()].map(
+              (number) => (
+                <CPaginationItem
+                  key={number + 1}
+                  active={currentPage === number + 1}
+                  onClick={() => handlePageChange(number + 1)}
+                >
+                  {number + 1}
+                </CPaginationItem>
+              ),
+            )}
+            <CPaginationItem
+              disabled={currentPage === Math.ceil(filteredPesananList.length / itemsPerPage)}
+              onClick={() => handlePageChange(currentPage + 1)}
+            >
+              <CIcon icon={cilChevronRight} />
+            </CPaginationItem>
+          </CPagination>
+        </CCol>
+        <CCol md={4}>
+          <div style={{ width: '220px' }}></div>
+        </CCol>
+      </CRow>
 
-      {/* Modal untuk edit pesanan */}
+      {/* Modal untuk Edit/Tambah Pesanan */}
       <CModal
         visible={modalOpen}
         onClose={() => {
           setModalOpen(false)
-          setShowModalAlert(false) // Reset alert saat modal ditutup
+          setShowModalAlert(false)
         }}
       >
         <CModalHeader>
           <CModalTitle>{editMode ? 'Edit Pesanan' : 'Tambah Pesanan'}</CModalTitle>
         </CModalHeader>
         <CModalBody>
-          {/* Tampilkan alert di dalam modal */}
           {showModalAlert && (
             <CAlert color="warning" onClose={() => setShowModalAlert(false)} dismissible>
               {modalAlertMessage}
@@ -383,24 +441,27 @@ const Orders = () => {
               onChange={handleChange}
               required
             />
-            <label className="form-label">Tanggal</label>
-            <div className="d-flex align-items-center">
-              {/* DatePicker dengan custom input CFormInput */}
-              <DatePicker
-                selected={formData.Tanggal ? new Date(formData.Tanggal) : null}
-                onChange={(date) =>
-                  setFormData({
-                    ...formData,
-                    Tanggal: date ? date.toISOString().split('T')[0] : '',
-                  })
-                }
-                dateFormat="yyyy-MM-dd"
-                customInput={<CustomDateInput />}
-              />
-              <CButton color="secondary" size="sm" className="ms-2" onClick={handleClearDate2}>
-                Clear
-              </CButton>
-            </div>
+            <CFormLabel className="mt-3">Tanggal</CFormLabel>
+            <CRow className="align-items-center">
+              <CCol xs={9}>
+                <DatePicker
+                  selected={formData.Tanggal ? new Date(formData.Tanggal) : null}
+                  onChange={(date) =>
+                    setFormData({
+                      ...formData,
+                      Tanggal: date ? date.toISOString().split('T')[0] : '',
+                    })
+                  }
+                  dateFormat="yyyy-MM-dd"
+                  customInput={<CustomDateInput />}
+                />
+              </CCol>
+              <CCol xs={3}>
+                <CButton color="secondary" size="sm" onClick={handleClearDate2}>
+                  Clear
+                </CButton>
+              </CCol>
+            </CRow>
           </CForm>
         </CModalBody>
         <CModalFooter>
@@ -419,7 +480,7 @@ const Orders = () => {
         </CModalFooter>
       </CModal>
 
-      {/* Modal konfirmasi hapus */}
+      {/* Modal Konfirmasi Hapus */}
       <CModal visible={confirmDeleteVisible} onClose={() => setConfirmDeleteVisible(false)}>
         <CModalHeader>
           <CModalTitle>Konfirmasi Hapus</CModalTitle>
@@ -437,7 +498,7 @@ const Orders = () => {
         </CModalFooter>
       </CModal>
 
-      {/* Modal konfirmasi menyelesaikan pesanan */}
+      {/* Modal Konfirmasi Selesaikan Pesanan */}
       <CModal visible={confirmDoneVisible} onClose={() => setConfirmDoneVisible(false)}>
         <CModalHeader>
           <CModalTitle>Konfirmasi Selesaikan Pesanan</CModalTitle>
@@ -455,36 +516,37 @@ const Orders = () => {
         </CModalFooter>
       </CModal>
 
-      {/* Modal untuk menampilkan detail pesanan - Updated to match your code */}
-      <CModal 
-        visible={detailModal} 
-        onClose={() => setDetailModal(false)}
-        size="lg"
-      >
+      {/* Modal Detail Pesanan */}
+      <CModal visible={detailModal} onClose={() => setDetailModal(false)} size="lg">
         <CModalHeader onClose={() => setDetailModal(false)}>
           <CModalTitle>Detail Pesanan</CModalTitle>
         </CModalHeader>
         <CModalBody>
           {selectedPesanan && (
             <>
-              <div className="mb-4">
-                <div className="row">
-                  <div className="col-md-6">
-                    <p><strong>Nama Pelanggan:</strong> {selectedPesanan.Nama_Pelanggan}</p>
-                    <p><strong>Tanggal:</strong> {formatDate(selectedPesanan.Tanggal)}</p>
-                  </div>
-                  <div className="col-md-6">
-                    <p><strong>Waktu:</strong> {selectedPesanan.Waktu}</p>
-                    <p>
-                      <strong>Status:</strong> 
-                      <span className={`badge ${selectedPesanan.Status === 'Done' ? 'bg-success' : 'bg-danger'} ms-2`}>
-                        {selectedPesanan.Status}
-                      </span>
-                    </p>
-                  </div>
-                </div>
-              </div>
-              
+              <CRow className="mb-4">
+                <CCol md={6}>
+                  <p>
+                    <strong>Nama Pelanggan:</strong> {selectedPesanan.Nama_Pelanggan}
+                  </p>
+                  <p>
+                    <strong>Tanggal:</strong> {formatDate(selectedPesanan.Tanggal)}
+                  </p>
+                </CCol>
+                <CCol md={6}>
+                  <p>
+                    <strong>Waktu:</strong> {selectedPesanan.Waktu}
+                  </p>
+                  <p>
+                    <strong>Status:</strong>{' '}
+                    <span
+                      className={`badge ${selectedPesanan.Status === 'Done' ? 'bg-success' : 'bg-danger'} ms-2`}
+                    >
+                      {selectedPesanan.Status}
+                    </span>
+                  </p>
+                </CCol>
+              </CRow>
               <CTable bordered>
                 <CTableHead>
                   <CTableRow>
@@ -522,7 +584,7 @@ const Orders = () => {
           </CButton>
         </CModalFooter>
       </CModal>
-    </div>
+    </CContainer>
   )
 }
 
