@@ -66,9 +66,9 @@ class Database:
             data = list(resultFind)
 
             # Debugging Output
-            print(f"DEBUG: findMany - Jumlah data ditemukan: {len(data)}")
-            for item in data:
-                print(f"DEBUG: Data item: {item}")  
+            # print(f"DEBUG: findMany - Jumlah data ditemukan: {len(data)}")
+            # for item in data:
+            #     print(f"DEBUG: Data item: {item}")  
 
             status = True
         except errors.PyMongoError as pymongoError:

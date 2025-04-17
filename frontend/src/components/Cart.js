@@ -47,7 +47,7 @@ const CustomDateInput = React.forwardRef(({ value, onClick, onChange, placeholde
 // Generate pilihan waktu (dari jam 5:00 PM sampai 11:00 PM, interval 15 menit)
 const timeOptions = []
 for (let hour = 17; hour <= 22; hour++) {
-  for (let minute = 0; minute < 60; minute += 15) {
+  for (let minute = 0; minute < 60; minute += 30) {
     if (hour === 22 && minute > 0) continue
     const formattedHour = hour.toString().padStart(2, '0')
     const formattedMinute = minute.toString().padStart(2, '0')
@@ -207,32 +207,30 @@ const Cart = ({ cartItems, removeFromCart, clearCart }) => {
               </CTable>
               <hr />
               <CForm>
-                {/* Tanggal Pemesanan */}
-                <CRow className="mb-1">
-                  <CCol>
+                <CRow className="mb-3">
+                  {/* Tanggal Pemesanan */}
+                  <CCol xs={12} md={6}>
                     <CFormLabel className="fs-6 fw-bold">Tanggal Pemesanan</CFormLabel>
+                    <div className="mt-2">
+                      <DatePicker
+                        locale={ID}
+                        selected={tableDate}
+                        onChange={(date) => setTableDate(date)}
+                        dateFormat="dd MMMM yyyy"
+                        customInput={<CustomDateInput />}
+                        className="fs-6 w-100"
+                      />
+                    </div>
                   </CCol>
-                </CRow>
-                <CRow className="mb-3">
-                  <CCol>
-                    <DatePicker
-                      locale={ID}
-                      selected={tableDate}
-                      onChange={(date) => setTableDate(date)}
-                      dateFormat="dd MMMM yyyy"
-                      customInput={<CustomDateInput />}
-                      className="fs-6"
-                    />
-                  </CCol>
-                </CRow>
-                {/* Waktu Pemesanan */}
-                <CRow className="mb-3">
-                  <CCol>
+
+                  {/* Waktu Pemesanan */}
+                  <CCol xs={12} md={6}>
                     <CFormLabel className="fs-6 fw-bold">Waktu Pemesanan</CFormLabel>
                     <CFormSelect
                       value={tableTime}
                       onChange={(e) => setTableTime(e.target.value)}
                       className="fs-6"
+                      style={{ width: '58%' }}
                     >
                       <option value="">Pilih waktu</option>
                       {timeOptions.map((option) => (
@@ -243,6 +241,7 @@ const Cart = ({ cartItems, removeFromCart, clearCart }) => {
                     </CFormSelect>
                   </CCol>
                 </CRow>
+
                 <CRow className="mb-3">
                   <CCol>
                     <small className="text-muted d-block">

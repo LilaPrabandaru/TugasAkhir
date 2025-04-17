@@ -3,6 +3,7 @@ import { CContainer, CRow, CCol, CButton, CCard, CCardBody, CCardHeader } from '
 import MenuTable from '../../components/MenuTable'
 import Cart from '../../components/Cart'
 import { getUserDashboard } from '../../services/publicService'
+import LenteraGrill from '../../assets/images/LenteraGrill_1.png'
 
 const UserDashboard = () => {
   const [menuData, setMenuData] = useState([]) // State to store raw menu data
@@ -99,23 +100,32 @@ const UserDashboard = () => {
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
-          height: '100vh',
+          height: '84vh',
           textAlign: 'center',
           backgroundColor: '#f8f9fa',
         }}
       >
         <img
-          src="/path-to-restaurant-image.jpg"
-          alt="Restaurant"
-          style={{ width: '80%', maxWidth: '400px', borderRadius: '10px' }}
+          src={LenteraGrill}
+          alt="Lentera Grill"
+          style={{
+            width: '100%',
+            height: '100%',
+          }}
         />
         <CButton
           color="primary"
           size="lg"
-          style={{ marginTop: '20px' }}
           onClick={() => setShowSplash(false)}
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            zIndex: 10,
+          }}
         >
-          See the Menu
+          Menu
         </CButton>
       </div>
     )
