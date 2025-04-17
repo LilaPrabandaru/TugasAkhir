@@ -1,30 +1,32 @@
 import React from 'react'
-import { CFooter } from '@coreui/react'
+import { CFooter, CContainer, CRow, CCol, CLink } from '@coreui/react'
 
 const AppFooter = () => {
   return (
     <CFooter className="px-4">
-      <div>
-        <span className="ms-1">Jalan Senjoyo Tenda Biru Salatiga, Jawa Tengah</span>
-        <span className="ms-1"> | </span>
-        <span className="ms-1">
-          WA/CALL
-          <span className="ms-1"></span>
-          <a href="https://wa.me/+6289504047380" target="_blank" rel="noopener noreferrer">
-            089504047380
-          </a>
-        </span>
-        <span className="ms-1"> | </span>
-        <span className="ms-1">
-          <a
-            href="https://www.instagram.com/lenteragrill?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Instagram
-          </a>
-        </span>
-      </div>
+      <CContainer fluid>
+        <CRow className="align-items-center justify-content-center">
+          <CCol xs="auto" className="d-flex align-items-center">
+            <span className="me-2">Jalan Senjoyo Tenda Biru Salatiga, Jawa Tengah</span>
+            <span className="me-2">|</span>
+            <span className="me-2">
+              WA/CALL:&nbsp;
+              <CLink href="https://wa.me/+6289504047380" target="_blank" rel="noopener noreferrer">
+                089504047380
+              </CLink>
+            </span>
+            <span className="me-2">|</span>
+            <CLink
+              href="https://www.instagram.com/lenteragrill?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
+              target="_blank"
+              rel="noopener noreferrer"
+              className="me-2"
+            >
+              Instagram
+            </CLink>
+          </CCol>
+        </CRow>
+      </CContainer>
     </CFooter>
   )
 }

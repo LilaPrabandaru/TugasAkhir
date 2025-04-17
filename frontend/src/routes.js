@@ -10,7 +10,7 @@ const OrderHistory = React.lazy(() => import('./views/orderHistory/OrderHistory'
 const routes = [
   { path: '/', exact: true, name: 'Home' },
   { path: '/admin/dashboard', name: 'Dashboard', element: Dashboard },
-  { path: '/admin/orders', name: 'Orders', element: Orders },
+  { path: '/admin/orders', name: 'Current Orders', element: Orders },
   { path: '/admin/menu', name: 'Menu', element: Menu },
   { path: '/admin/karyawan', name: 'Karyawan', element: Karyawan },
   { path: '/admin/orderhistory', name: 'Order History', element: OrderHistory },

@@ -1,193 +1,163 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
+import DatePicker from 'react-datepicker'
+import 'react-datepicker/dist/react-datepicker.css'
+import ID from 'date-fns/locale/id'
 import {
+  CContainer,
+  CRow,
+  CCol,
   CCard,
   CCardBody,
-  CCardHeader,
-  CButton,
-  CListGroup,
-  CListGroupItem,
   CModal,
   CModalHeader,
+  CModalTitle,
   CModalBody,
   CModalFooter,
+  CButton,
   CTable,
   CTableHead,
   CTableRow,
   CTableHeaderCell,
   CTableBody,
   CTableDataCell,
+  CPagination,
+  CPaginationItem,
   CForm,
   CFormLabel,
-  CFormInput,
   CFormSelect,
-} from '@coreui/react';
-import axios from 'axios';
-import config from '../config'
-import { placeOrder, updateOrderStatus, getOrderStatus } from '../services/publicService';
+  CFormInput,
+  CBadge,
+  CAlert,
+} from '@coreui/react'
+import CIcon from '@coreui/icons-react'
+import { cilList, cilChevronLeft, cilChevronRight } from '@coreui/icons'
+import { placeOrder, updateOrderStatus, getOrderStatus } from '../services/publicService'
 
+// Custom input untuk DatePicker menggunakan CoreUI CFormInput
+const CustomDateInput = React.forwardRef(({ value, onClick, onChange, placeholder }, ref) => (
+  <CFormInput
+    value={value}
+    onClick={onClick}
+    onChange={onChange}
+    placeholder={placeholder}
+    ref={ref}
+  />
+))
+
+// Generate pilihan waktu (dari jam 5:00 PM sampai 11:00 PM, interval 15 menit)
+const timeOptions = []
+for (let hour = 17; hour <= 22; hour++) {
+  for (let minute = 0; minute < 60; minute += 30) {
+    if (hour === 22 && minute > 0) continue
+    const formattedHour = hour.toString().padStart(2, '0')
+    const formattedMinute = minute.toString().padStart(2, '0')
+    const timeValue = `${formattedHour}:${formattedMinute}`
+    const displayHour = hour > 12 ? hour - 12 : hour
+    const period = hour >= 12 ? 'PM' : 'AM'
+    const displayTime = `${displayHour}:${formattedMinute} ${period}`
+    timeOptions.push({ value: timeValue, label: displayTime })
+  }
+}
 
 const Cart = ({ cartItems, removeFromCart, clearCart }) => {
-  const [isCartModalOpen, setIsCartModalOpen] = useState(false); // Controls cart modal visibility
-  const [isSuccessModalOpen, setSuccessModalOpen] = useState(false);
-  const [paymentStatus, setPaymentStatus] = useState('Not Paid');
-  const [isTimeValid, setIsTimeValid] = useState(false);
-  const [tableDate, setTableDate] = useState(new Date().toISOString().split('T')[0]);
-  const [tableTime, setTableTime] = useState('');
-  const [orderTotal, setOrderTotal] = useState(0);
-  const [orderId, setOrderId] = useState(null);
+  const [isCartModalOpen, setIsCartModalOpen] = useState(false)
+  const [isSuccessModalOpen, setSuccessModalOpen] = useState(false)
+  const [paymentStatus, setPaymentStatus] = useState('Not Paid')
+  const [isTimeValid, setIsTimeValid] = useState(false)
+  // Simpan tableDate sebagai objek Date agar mudah diproses oleh DatePicker
+  const [tableDate, setTableDate] = useState(new Date())
+  const [tableTime, setTableTime] = useState('')
+  const [orderTotal, setOrderTotal] = useState(0)
+  const [orderId, setOrderId] = useState(null)
 
-  // Generate time options from 5:00 PM to 11:00 PM in 15-minute intervals
-  const timeOptions = [];
-  for (let hour = 17; hour <= 22; hour++) {
-    for (let minute = 0; minute < 60; minute += 15) {
-      // For 11:00 PM, we only want to include exactly 11:00, not 11:15, 11:30, etc.
-      if (hour === 22 && minute > 0) continue;
-      
-      const formattedHour = hour.toString().padStart(2, '0');
-      const formattedMinute = minute.toString().padStart(2, '0');
-      const timeValue = `${formattedHour}:${formattedMinute}`;
-      
-      // Format for display (5:00 PM, 5:15 PM, etc.)
-      const displayHour = hour > 12 ? hour - 12 : hour;
-      const period = hour >= 12 ? 'PM' : 'AM';
-      const displayTime = `${displayHour}:${formattedMinute.padStart(2, '0')} ${period}`;
-      
-      timeOptions.push({ value: timeValue, label: displayTime });
-    }
-  }
+  const userEmail = sessionStorage.getItem('email')
 
-  const userEmail = sessionStorage.getItem('email');
-
+  // Validasi: jika tableTime diisi, waktu valid
   useEffect(() => {
-    if (tableTime) {
-      setIsTimeValid(true);
-    } else {
-      setIsTimeValid(false);
-    }
-  }, [tableTime]);
+    setIsTimeValid(!!tableTime)
+  }, [tableTime])
 
   const confirmPayment = async () => {
-    console.log('Table Time:', tableTime);
-    console.log('Is Time Valid:', isTimeValid);
-
     if (!isTimeValid) {
-      alert('Silakan isi waktu pemesanan terlebih dahulu!');
-      return;
+      alert('Silakan isi waktu pemesanan terlebih dahulu!')
+      return
     }
-    // Prepare order data
+    // Siapkan data order
     const orderData = {
       Nama_Pelanggan: userEmail,
-      Tanggal: tableDate,
+      Tanggal: tableDate.toISOString().split('T')[0], // Format: YYYY-MM-DD
       Waktu: tableTime,
       Detail: cartItems.map((item) => ({
-        "Nama Menu": item.name,
+        'Nama Menu': item.name,
         Harga: item.price,
         Jumlah: item.quantity,
       })),
       total_harga: cartItems.reduce((total, item) => total + item.price * item.quantity, 0),
-    };
-
+    }
     try {
-      // Use the placeOrder function from publicService.js
-      
-      const orderResult = await placeOrder(orderData);
-      if(orderResult.status){
-        console.log(orderResult.payment_url)
+      const orderResult = await placeOrder(orderData)
+      if (orderResult.status) {
         window.open(orderResult.payment_url)
       }
-      const newOrderId = orderResult.order_id; // Assuming backend returns order ID
-      setOrderId(newOrderId);
-      
-      console.log('Order successfully added:', orderResult);
-
-      const total = cartItems.reduce(
-        (total, item) => total + item.price * item.quantity, 
-        0
-      );
-      setOrderTotal(total);
-
-      // Clear the cart and close modals
-      clearCart();
-      setIsCartModalOpen(false);
-      setSuccessModalOpen(true);
+      const newOrderId = orderResult.order_id // Backend mengembalikan order ID
+      setOrderId(newOrderId)
+      setOrderTotal(cartItems.reduce((total, item) => total + item.price * item.quantity, 0))
+      clearCart()
+      setIsCartModalOpen(false)
+      setSuccessModalOpen(true)
     } catch (error) {
-      console.error('Error during order submission:', error);
-      alert('Gagal membuat pesanan: ' + (error.response?.data?.message || 'Terjadi kesalahan.'));
+      console.error('Error during order submission:', error)
+      alert('Gagal membuat pesanan: ' + (error.response?.data?.message || 'Terjadi kesalahan.'))
     }
-  };
-  
-    // Function to manually update status to Pending
-    const updateToPending = async () => {
-      try {
-        await updateOrderStatus(orderId, 'Pending');
-        setPaymentStatus('Pending');
-        console.log('Status berhasil diperbarui menjadi Pending.');
-      } catch (error) {
-        console.error('Error updating status to Pending:', error);
-        console.log('Gagal memperbarui status ke Pending.');
-      }
-    };
-  
+  }
+
+  const updateToPending = async () => {
+    try {
+      await updateOrderStatus(orderId, 'Pending')
+      setPaymentStatus('Pending')
+    } catch (error) {
+      console.error('Error updating status to Pending:', error)
+    }
+  }
 
   return (
     <>
       {/* Floating Cart Button */}
-      <div
-        style={{
-          position: 'fixed',
-          bottom: '20px',
-          right: '20px',
-          width: '280px',
-          background: '#1e1e1e',
-          color: '#fff',
-          padding: '10px',
-          borderRadius: '8px',
-          boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
-          cursor: 'pointer',
-          zIndex: 1000,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-        onClick={() => setIsCartModalOpen(true)} // Open cart modal on click
+      <CCard
+        className="position-fixed shadow bg-dark text-white"
+        style={{ bottom: '20px', right: '20px', width: '280px', cursor: 'pointer', zIndex: 1000 }}
+        onClick={() => setIsCartModalOpen(true)}
       >
-        <div>
-          🛒 Keranjang{' '}
-          {cartItems.length >= 0 && (
-            <span
-              style={{
-                background: 'red',
-                color: '#fff',
-                borderRadius: '50%',
-                padding: '2px 6px',
-                fontSize: '12px',
-                marginLeft: '5px',
-              }}
-            >
-              {cartItems.length}
-            </span>
-          )}
-        </div>
-        <div>
-          Rp{' '}
-          {cartItems.reduce((total, item) => total + item.price * item.quantity, 0).toLocaleString()}
-        </div>
-      </div>
+        <CCardBody className="d-flex align-items-center justify-content-between">
+          <div>
+            🛒 Keranjang{' '}
+            {cartItems.length >= 0 && (
+              <span className="bg-danger text-white rounded-circle px-2 fs-6 ms-1">
+                {cartItems.length}
+              </span>
+            )}
+          </div>
+          <div>
+            Rp{' '}
+            {cartItems
+              .reduce((total, item) => total + item.price * item.quantity, 0)
+              .toLocaleString()}
+          </div>
+        </CCardBody>
+      </CCard>
 
       {/* Cart Modal */}
-      <CModal
-        visible={isCartModalOpen}
-        onClose={() => setIsCartModalOpen(false)}
-        size="lg" // Increase the modal size
-      >
+      <CModal visible={isCartModalOpen} onClose={() => setIsCartModalOpen(false)} size="lg">
         <CModalHeader>
-          <h4 style={{ fontWeight: 'bold' }}>🛒 Keranjang</h4> {/* Larger header */}
+          <CModalTitle className="fw-bold">🛒 Keranjang</CModalTitle>
         </CModalHeader>
         <CModalBody>
           {cartItems.length === 0 ? (
-            <p style={{ fontSize: '18px', textAlign: 'center', marginTop: '20px' }}>
-              Keranjang kosong
-            </p>
+            <CRow className="justify-content-center mt-4">
+              <CCol xs={12} className="fs-5 text-center">
+                Keranjang kosong
+              </CCol>
+            </CRow>
           ) : (
             <>
               <CTable striped hover responsive>
@@ -196,29 +166,25 @@ const Cart = ({ cartItems, removeFromCart, clearCart }) => {
                     <CTableHeaderCell>#</CTableHeaderCell>
                     <CTableHeaderCell>Item</CTableHeaderCell>
                     <CTableHeaderCell>Qty</CTableHeaderCell>
-                    <CTableHeaderCell>Harga</CTableHeaderCell>
-                    <CTableHeaderCell>Total</CTableHeaderCell>
-                    <CTableHeaderCell>Aksi</CTableHeaderCell> {/* Added column for actions */}
+                    <CTableHeaderCell style={{ width: '120px' }}>Harga</CTableHeaderCell>
+                    <CTableHeaderCell style={{ width: '150px' }}>Total</CTableHeaderCell>
+                    <CTableHeaderCell>Aksi</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
                   {cartItems.map((item, index) => (
                     <CTableRow key={index}>
                       <CTableDataCell>{index + 1}</CTableDataCell>
-                      <CTableDataCell style={{ fontSize: '16px' }}>{item.name}</CTableDataCell>
-                      <CTableDataCell style={{ fontSize: '16px' }}>{item.quantity}</CTableDataCell>
-                      <CTableDataCell style={{ fontSize: '16px' }}>
+                      <CTableDataCell className="fs-6">{item.name}</CTableDataCell>
+                      <CTableDataCell className="fs-6">{item.quantity}</CTableDataCell>
+                      <CTableDataCell className="fs-6">
                         Rp {item.price.toLocaleString()}
                       </CTableDataCell>
-                      <CTableDataCell style={{ fontSize: '16px' }}>
+                      <CTableDataCell className="fs-6">
                         Rp {(item.price * item.quantity).toLocaleString()}
                       </CTableDataCell>
                       <CTableDataCell>
-                        <CButton
-                          color="danger"
-                          size="sm"
-                          onClick={() => removeFromCart(index)} // Remove item from cart
-                        >
+                        <CButton color="danger" size="sm" onClick={() => removeFromCart(index)}>
                           ❌ Hapus
                         </CButton>
                       </CTableDataCell>
@@ -226,63 +192,66 @@ const Cart = ({ cartItems, removeFromCart, clearCart }) => {
                   ))}
                   {/* Total Row */}
                   <CTableRow>
-                    <CTableDataCell
-                      colSpan="4"
-                      style={{
-                        textAlign: 'right',
-                        fontWeight: 'bold',
-                        fontSize: '18px',
-                        padding: '15px',
-                      }}
-                    >
+                    <CTableDataCell colSpan="4" className="text-end fw-bold fs-5 p-3">
                       Total:
                     </CTableDataCell>
-                    <CTableDataCell
-                      style={{
-                        fontWeight: 'bold',
-                        fontSize: '18px',
-                        padding: '15px',
-                      }}
-                    >
+                    <CTableDataCell className="fw-bold fs-5 p-3">
                       Rp{' '}
                       {cartItems
                         .reduce((total, item) => total + item.price * item.quantity, 0)
                         .toLocaleString()}
                     </CTableDataCell>
-                    <CTableDataCell></CTableDataCell> {/* Empty cell for alignment */}
+                    <CTableDataCell />
                   </CTableRow>
                 </CTableBody>
               </CTable>
               <hr />
               <CForm>
-                <CFormLabel style={{ fontSize: '16px', fontWeight: 'bold' }}>Tanggal Pemesanan</CFormLabel>
-                <CFormInput
-                  type="date"
-                  value={tableDate}
-                  onChange={(e) => setTableDate(e.target.value)}
-                  style={{ marginBottom: '15px', fontSize: '16px' }}
-                />
-                <CFormLabel style={{ fontSize: '16px', fontWeight: 'bold' }}>Waktu Pemesanan</CFormLabel>
-                <div>
-                  <CFormSelect
-                    value={tableTime}
-                    onChange={(e) => setTableTime(e.target.value)}
-                    style={{ marginBottom: '15px', fontSize: '16px' }}
-                  >
-                    <option value="">Pilih waktu</option>
-                    {timeOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </CFormSelect>
-                  <small style={{ color: '#6c757d', display: 'block', marginTop: '-10px', marginBottom: '15px' }}>
-                    Restoran buka dari jam 5:00 PM sampai 10:00 PM
-                  </small>
-                </div>
-                {!isTimeValid && (
-                  <small style={{ color: 'red' }}>Waktu pemesanan wajib diisi!</small>
-                )}
+                <CRow className="mb-3">
+                  {/* Tanggal Pemesanan */}
+                  <CCol xs={12} md={6}>
+                    <CFormLabel className="fs-6 fw-bold">Tanggal Pemesanan</CFormLabel>
+                    <div className="mt-2">
+                      <DatePicker
+                        locale={ID}
+                        selected={tableDate}
+                        onChange={(date) => setTableDate(date)}
+                        dateFormat="dd MMMM yyyy"
+                        customInput={<CustomDateInput />}
+                        className="fs-6 w-100"
+                      />
+                    </div>
+                  </CCol>
+
+                  {/* Waktu Pemesanan */}
+                  <CCol xs={12} md={6}>
+                    <CFormLabel className="fs-6 fw-bold">Waktu Pemesanan</CFormLabel>
+                    <CFormSelect
+                      value={tableTime}
+                      onChange={(e) => setTableTime(e.target.value)}
+                      className="fs-6"
+                      style={{ width: '58%' }}
+                    >
+                      <option value="">Pilih waktu</option>
+                      {timeOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </CFormSelect>
+                  </CCol>
+                </CRow>
+
+                <CRow className="mb-3">
+                  <CCol>
+                    <small className="text-muted d-block">
+                      Lentera Grill buka dari jam 5:00 PM sampai 10:00 PM
+                    </small>
+                    {!isTimeValid && (
+                      <small className="text-danger">Waktu pemesanan wajib diisi!</small>
+                    )}
+                  </CCol>
+                </CRow>
               </CForm>
             </>
           )}
@@ -291,21 +260,22 @@ const Cart = ({ cartItems, removeFromCart, clearCart }) => {
           <CButton
             color="secondary"
             onClick={() => setIsCartModalOpen(false)}
-            style={{ fontSize: '16px', padding: '10px 20px' }}
+            className="fs-6 py-2 px-3"
           >
             Batal
           </CButton>
           <CButton
             onClick={confirmPayment}
-            color='success'
-            style={{ fontSize: '16px', padding: '10px 20px' }}
-            disabled={!isTimeValid} // Nonaktifkan tombol jika waktu tidak valid
+            color="success"
+            className="fs-6 py-2 px-3"
+            disabled={!isTimeValid || cartItems.length === 0}
           >
             Bayar Sekarang
           </CButton>
         </CModalFooter>
       </CModal>
 
+      {/* Success Modal */}
       <CModal
         visible={isSuccessModalOpen}
         onClose={() => setSuccessModalOpen(false)}
@@ -317,7 +287,7 @@ const Cart = ({ cartItems, removeFromCart, clearCart }) => {
           background: 'rgba(0, 0, 0, 0.5)',
         }}
       >
-        <CModalBody style={{ textAlign: 'center', padding: 40, background: '#212631', borderRadius: 15 }}>
+        <CCard className="p-4 bg-dark text-center" style={{ background: '#212631' }}>
           {paymentStatus === 'Not Paid' ? (
             <>
               <h2>🎉 Pembayaran Berhasil!</h2>
@@ -334,40 +304,28 @@ const Cart = ({ cartItems, removeFromCart, clearCart }) => {
               <p>Silakan selesaikan pembayaran untuk melanjutkan.</p>
             </>
           )}
-
-          {/* Button to manually update status to Pending */}
-          {paymentStatus === 'Not Paid' && (
-            <CButton
-              color="warning"
-              onClick={updateToPending}
-              style={{ marginTop: 20, width: 150, marginRight: 10 }}
-            >
-              Cek Pembayaran
-            </CButton>
-          )}
-
-          {/* Close Button */}
-          <CButton
-            color="secondary"
-            onClick={() => setSuccessModalOpen(false)}
-            style={{ marginTop: 20, width: 150 }}
-          >
-            Tutup
-          </CButton>
-        </CModalBody>
+          <CRow className="justify-content-center mt-3">
+            {paymentStatus === 'Not Paid' && (
+              <CCol xs="auto">
+                <CButton color="warning" onClick={updateToPending} style={{ width: '150px' }}>
+                  Cek Pembayaran
+                </CButton>
+              </CCol>
+            )}
+            <CCol xs="auto">
+              <CButton
+                color="secondary"
+                onClick={() => setSuccessModalOpen(false)}
+                style={{ width: '150px' }}
+              >
+                Tutup
+              </CButton>
+            </CCol>
+          </CRow>
+        </CCard>
       </CModal>
-
-      {/* Animation CSS */}
-      <style>
-        {`
-          @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-          }
-        `}
-      </style>
     </>
-  );
-};
+  )
+}
 
-export default Cart;
+export default Cart

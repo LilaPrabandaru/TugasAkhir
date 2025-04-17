@@ -1,6 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { NavLink } from 'react-router-dom'
-import { useSelector, useDispatch } from 'react-redux'
 import {
   CContainer,
   CDropdown,
@@ -9,31 +7,27 @@ import {
   CDropdownToggle,
   CHeader,
   CHeaderNav,
-  CHeaderToggler,
-  CNavLink,
   CNavItem,
   useColorModes,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilContrast, cilMenu, cilMoon, cilSun } from '@coreui/icons'
-
-// File AppBreadcrumbUser.js hapus kasep gawe 
-// import { AppBreadcrumbUser } from './index'
-// import { AppHeaderDropdown } from './header/index'
+import { cilContrast, cilMoon, cilSun, cilAccountLogout } from '@coreui/icons'
 
 const AppHeaderUser = () => {
-  const headerRef = useRef()
-  const { colorMode, setColorMode } = useColorModes('coreui-free-react-admin-template-theme')
+  const headerRef = useRef(null)
+  const { colorMode, setColorMode } = useColorModes(
+    'coreui-free-react-admin-template-theme',
+    'light',
+  )
   const [currentDate, setCurrentDate] = useState('')
 
-  const dispatch = useDispatch()
-  const sidebarShow = useSelector((state) => state.sidebarShow)
-
   useEffect(() => {
-    document.addEventListener('scroll', () => {
-      headerRef.current &&
+    const onScroll = () => {
+      if (headerRef.current) {
         headerRef.current.classList.toggle('shadow-sm', document.documentElement.scrollTop > 0)
-    })
+      }
+    }
+    document.addEventListener('scroll', onScroll)
     const today = new Date()
     const formattedDate = today.toLocaleDateString('id-ID', {
       day: '2-digit',
@@ -41,30 +35,50 @@ const AppHeaderUser = () => {
       year: 'numeric',
     })
     setCurrentDate(formattedDate)
+
+    return () => document.removeEventListener('scroll', onScroll)
   }, [])
 
-  return (
-    <CHeader position="sticky" className="mb-4 p-0" ref={headerRef}>
-      <CContainer className="border-bottom px-4" fluid>
-        <CHeaderToggler
-          onClick={() => dispatch({ type: 'set', sidebarShow: !sidebarShow })}
-          style={{ marginInlineStart: '-14px' }}
-        >
-          <CIcon icon={cilMenu} size="lg" />
-        </CHeaderToggler>
-        {/* <CHeaderNav className="d-none d-md-flex">
-          <CNavItem>
-            <CNavLink to="/admin/dashboard" as={NavLink}>
-              Dashboard
-            </CNavLink>
-          </CNavItem>
-        </CHeaderNav> */}
+  const handleLogout = () => {
+    sessionStorage.removeItem('access_token')
+    sessionStorage.removeItem('email')
+    sessionStorage.removeItem('user_id')
+    sessionStorage.removeItem('user_role')
+    window.location.href = '/login'
+  }
 
-        <CHeaderNav>
-          <li className="nav-item py-1">
-            <div className="vr h-100 mx-2 text-body text-opacity-75"></div>
-          </li>
-          <CDropdown variant="nav-item" placement="bottom-end">
+  return (
+    <CHeader position="sticky" className="p-0" ref={headerRef}>
+      <CContainer
+        fluid
+        className="border-bottom px-4 d-flex justify-content-between align-items-center"
+      >
+        {/* Bagian kiri (kosong/dapat diisi logo jika diperlukan) */}
+        <div style={{ width: '33.33%' }} />
+
+        {/* Bagian tengah: Menu dan Order History */}
+        <CHeaderNav
+          className="d-flex align-items-center justify-content-center"
+          style={{ width: '33.33%' }}
+        >
+          <CNavItem>
+            <a href="/user/dashboard" className="nav-link">
+              Menu
+            </a>
+          </CNavItem>
+          <CNavItem>
+            <a href="/user/orderhistory" className="nav-link">
+              Order History
+            </a>
+          </CNavItem>
+        </CHeaderNav>
+
+        {/* Bagian kanan: Pengaturan tema, tanggal, dan Logout */}
+        <CHeaderNav
+          className="d-flex align-items-center justify-content-end"
+          style={{ width: '33.33%' }}
+        >
+          <CDropdown variant="nav-item" placement="bottom-end" className="me-2">
             <CDropdownToggle caret={false}>
               {colorMode === 'dark' ? (
                 <CIcon icon={cilMoon} size="lg" />
@@ -82,7 +96,7 @@ const AppHeaderUser = () => {
                 type="button"
                 onClick={() => setColorMode('light')}
               >
-                <CIcon className="me-2" icon={cilSun} size="lg" /> Light
+                <CIcon icon={cilSun} size="lg" className="me-2" /> Light
               </CDropdownItem>
               <CDropdownItem
                 active={colorMode === 'dark'}
@@ -91,7 +105,7 @@ const AppHeaderUser = () => {
                 type="button"
                 onClick={() => setColorMode('dark')}
               >
-                <CIcon className="me-2" icon={cilMoon} size="lg" /> Dark
+                <CIcon icon={cilMoon} size="lg" className="me-2" /> Dark
               </CDropdownItem>
               <CDropdownItem
                 active={colorMode === 'auto'}
@@ -100,21 +114,33 @@ const AppHeaderUser = () => {
                 type="button"
                 onClick={() => setColorMode('auto')}
               >
-                <CIcon className="me-2" icon={cilContrast} size="lg" /> Auto
+                <CIcon icon={cilContrast} size="lg" className="me-2" /> Auto
               </CDropdownItem>
             </CDropdownMenu>
           </CDropdown>
-          <li className="nav-item py-1">
-            <div className="vr h-100 mx-2 text-body text-opacity-75"></div>
-          </li>
-          <div className="d-flex align-items-center ms-auto">
-            {currentDate}
-          </div>
-          {/* <AppHeaderDropdown /> */}
+
+          {/* Pembatas */}
+          <CNavItem className="py-1">
+            <div className="vr mx-2"></div>
+          </CNavItem>
+
+          {/* Tanggal */}
+          <CNavItem className="d-flex align-items-center me-3">
+            <span>{currentDate}</span>
+          </CNavItem>
+
+          {/* Pembatas */}
+          <CNavItem className="py-1">
+            <div className="vr mx-2"></div>
+          </CNavItem>
+
+          {/* Logout */}
+          <CNavItem className="d-flex align-items-center">
+            <a href="#" className="nav-link d-flex align-items-center" onClick={handleLogout}>
+              <CIcon icon={cilAccountLogout} size="lg" className="me-2" /> Logout
+            </a>
+          </CNavItem>
         </CHeaderNav>
-      </CContainer>
-      <CContainer className="px-4" fluid>
-        {/* <AppBreadcrumbUser /> */}
       </CContainer>
     </CHeader>
   )
