@@ -18,7 +18,7 @@ def get_jwt_secret_key():
     secret_key = secrets.token_hex(32)
     os.environ['JWT_SECRET_KEY'] = secret_key
     
-    return secret_key
+    return str(secret_key)
 
 JWT_SECRET_KEY = get_jwt_secret_key()
 BLACKLIST = set()
