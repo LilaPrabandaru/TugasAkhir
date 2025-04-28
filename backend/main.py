@@ -64,7 +64,7 @@ class ProtectedDeleteKaryawan(DeleteKaryawan):
 
 # Menu Routes
 class ProtectedGetMenu(GetMenu):
-    @jwt_required()
+    #@jwt_required()
     def get(self):
         return super().get()
 
