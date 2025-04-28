@@ -11,7 +11,7 @@ from controller.pesanan_controller import GetAllPesanan, GetPesananById, GetPesa
 from controller.public_controller import GetMenu, AddPesananUser, GetAllPesananUser, UpdatePaymentStatus, GetOrderStatus, MidtransNotification
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=["https://tugas-akhir-pcrhru6mj-lila-prabandarus-projects.vercel.app"])
 api = Api(app)
 
 app.config['JWT_SECRET_KEY'] = JWT_SECRET_KEY
