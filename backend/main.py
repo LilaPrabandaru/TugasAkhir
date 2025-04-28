@@ -11,7 +11,7 @@ from controller.pesanan_controller import GetAllPesanan, GetPesananById, GetPesa
 from controller.public_controller import GetMenu, AddPesananUser, GetAllPesananUser, UpdatePaymentStatus, GetOrderStatus, MidtransNotification
 
 app = Flask(__name__)
-CORS(app, origins=["https://tugas-akhir-pcrhru6mj-lila-prabandarus-projects.vercel.app"])
+CORS(app)
 api = Api(app)
 
 app.config['JWT_SECRET_KEY'] = JWT_SECRET_KEY
@@ -169,5 +169,28 @@ api.add_resource(ProtectedUpdateStatusOrder, '/user/update_status/<string:pesana
 #Payment Status
 api.add_resource(GetOrderStatus, '/user/order-status/<string:order_id>')
 api.add_resource(MidtransNotification, '/midtrans-notification-handler')
+
+def handler(event, context):
+    from werkzeug.test import EnvironBuilder
+    from werkzeug.wrappers import Request
+
+    # Build WSGI environment dari event
+    builder = EnvironBuilder(
+        method=event.get('method', 'GET'),
+        path=event.get('path', '/'),
+        headers=event.get('headers', {}),
+        data=event.get('body', None),
+        query_string=event.get('queryStringParameters', None)
+    )
+    env = builder.get_environ()
+
+    req = Request(env)
+    resp = app.full_dispatch_request()
+
+    return {
+        "statusCode": resp.status_code,
+        "headers": dict(resp.headers),
+        "body": resp.get_data(as_text=True)
+    }
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
