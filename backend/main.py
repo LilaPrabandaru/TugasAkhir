@@ -169,28 +169,5 @@ api.add_resource(ProtectedUpdateStatusOrder, '/user/update_status/<string:pesana
 #Payment Status
 api.add_resource(GetOrderStatus, '/user/order-status/<string:order_id>')
 api.add_resource(MidtransNotification, '/midtrans-notification-handler')
-
-def handler(event, context):
-    from werkzeug.test import EnvironBuilder
-    from werkzeug.wrappers import Request
-
-    # Build WSGI environment dari event
-    builder = EnvironBuilder(
-        method=event.get('method', 'GET'),
-        path=event.get('path', '/'),
-        headers=event.get('headers', {}),
-        data=event.get('body', None),
-        query_string=event.get('queryStringParameters', None)
-    )
-    env = builder.get_environ()
-
-    req = Request(env)
-    resp = app.full_dispatch_request()
-
-    return {
-        "statusCode": resp.status_code,
-        "headers": dict(resp.headers),
-        "body": resp.get_data(as_text=True)
-    }
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
