@@ -95,20 +95,11 @@ const OrderHistoryUser = () => {
   }
 
   return (
-    <CContainer>
-      <CRow className="justify-content-center">
-        <CCol>
-          <h2 className="text-center">Order History</h2>
-        </CCol>
-      </CRow>
-
-      {/* Tabel Order History */}
-      <CCard className="mb-4">
-        <CCardHeader>
-          <h5>Order History</h5>
-        </CCardHeader>
+    <CContainer className='mt-5'>
+      <CCard className="mb-3">
         <CCardBody>
-          <CTable bordered hover responsive>
+          <h3 className="text-center">Order History</h3>
+          <CTable bordered hover responsive striped>
             <CTableHead>
               <CTableRow>
                 <CTableHeaderCell width="5%">No</CTableHeaderCell>

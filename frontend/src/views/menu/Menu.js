@@ -159,9 +159,7 @@ const Menu = () => {
     <CContainer>
       <CRow className="justify-content-center">
         <CCol xs={12}>
-          <h2 className="text-center">
-            Daftar Menu
-          </h2>
+          <h2 className="text-center">Daftar Menu</h2>
         </CCol>
       </CRow>
 
@@ -177,15 +175,14 @@ const Menu = () => {
         </CCol>
       </CRow>
 
-      <CCard className="shadow-sm">
-        <CCardBody>
-          {Object.keys(groupedMenuData).map((kategori) => (
-            <CRow key={kategori} className="mb-3">
-              <CCol xs={12}>
-                <h3>
-                  <strong>{kategori}</strong>
-                </h3>
-              </CCol>
+      {/* Tabel per kategori */}
+      {Object.keys(groupedMenuData).map((kategori) => (
+        <CCard key={kategori} className="shadow-sm mb-3">
+          <CCardBody>
+            <h3>
+              <strong>{kategori}</strong>
+            </h3>
+            <CRow>
               <CCol xs={12}>
                 <CTable bordered hover responsive striped>
                   <CTableHead>
@@ -237,9 +234,9 @@ const Menu = () => {
                 </CTable>
               </CCol>
             </CRow>
-          ))}
-        </CCardBody>
-      </CCard>
+          </CCardBody>
+        </CCard>
+      ))}
 
       {/* Add Menu Modal */}
       <CModal visible={modalVisible} onClose={handleCloseModal}>

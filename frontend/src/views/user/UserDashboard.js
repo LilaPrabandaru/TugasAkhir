@@ -114,15 +114,19 @@ const UserDashboard = () => {
           }}
         />
         <CButton
-          color="primary"
           size="lg"
           onClick={() => setShowSplash(false)}
           style={{
+            backgroundColor: 'transparent',
+            color: 'black',
+            border: '2px solid black',
             position: 'absolute',
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
             zIndex: 10,
+            padding: '0.5rem 2rem', // vertical 0.5rem, horizontal 2rem
+            borderRadius: '2rem', // sudut sangat melengkung → pill
           }}
         >
           Menu
@@ -140,13 +144,11 @@ const UserDashboard = () => {
       </CRow>
       {/* Render grouped menu items */}
       {Object.keys(groupedMenuItems).map((category) => (
-        <CCard key={category} className="mb-3">
-          <CCardHeader>
+        <CCard key={category} className="shadow-sm mb-3">
+          <CCardBody>
             <h3>
               <strong>{category}</strong>
             </h3>
-          </CCardHeader>
-          <CCardBody>
             <MenuTable menuItems={groupedMenuItems[category]} addToCart={addToCart} />
           </CCardBody>
         </CCard>
