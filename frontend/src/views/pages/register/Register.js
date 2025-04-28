@@ -25,6 +25,10 @@ const Register = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault()
+    if (!email.trim() || !password.trim()) {
+      setError('Username dan Password harus diisi!')
+      return
+    }
     console.log('Mengirim data:', { email, password }) // Debugging
     try {
       const data = await register(email, password)
@@ -32,7 +36,7 @@ const Register = () => {
       navigate('/login')
     } catch (error) {
       console.error('Registration failed:', error)
-      setError('Email Sudah Terdaftar')
+      setError('Username Sudah Terdaftar')
     }
   }
 
@@ -52,7 +56,7 @@ const Register = () => {
                       <CIcon icon={cilUser} />
                     </CInputGroupText>
                     <CFormInput
-                      placeholder="Email"
+                      placeholder="Username"
                       autoComplete="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}

@@ -26,6 +26,10 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault()
+    if (!email.trim() || !password.trim()) {
+      setError('Username dan Password harus diisi!')
+      return
+    }
     try {
       const data = await login(email, password)
       console.log('Login successful:', data)
@@ -42,7 +46,7 @@ const Login = () => {
       }
     } catch (error) {
       console.error('Login failed:', error)
-      setError('Email Atau Password Salah')
+      setError('Username Atau Password Salah')
     }
   }
 
@@ -63,7 +67,7 @@ const Login = () => {
                         <CIcon icon={cilUser} />
                       </CInputGroupText>
                       <CFormInput
-                        placeholder="Email"
+                        placeholder="Username"
                         autoComplete="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}

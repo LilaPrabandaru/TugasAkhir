@@ -211,8 +211,10 @@ const Orders = () => {
 
   const indexOfLastItem = currentPage * itemsPerPage
   const indexOfFirstItem = indexOfLastItem - itemsPerPage
-  // Jika selectedDate ada, filter berdasarkan tanggal dan urutkan berdasarkan waktu,
-  // jika tidak, urutkan berdasarkan tanggal ascending dan jika tanggal sama, urutkan berdasarkan waktu ascending
+
+  // Jika selectedDate/pilih tanggal ada, filter berdasarkan tanggal dan urutkan berdasarkan waktu,
+  // jika selectedDate/pilih tanggal tidak ada, urutkan berdasarkan tanggal ascending dan jika tanggal sama, urutkan berdasarkan waktu ascending
+  //==================== FCFS ====================
   const filteredPesananList = selectedDate
     ? pesananList
         .filter((pesanan) => {
@@ -239,6 +241,7 @@ const Orders = () => {
         }
         return dateA - dateB
       })
+  //==================== FCFS ====================
 
   const currentItems = filteredPesananList.slice(indexOfFirstItem, indexOfLastItem)
   const formatDate = (dateStr) => {
@@ -307,10 +310,8 @@ const Orders = () => {
 
       {/* Tabel Order di dalam Card */}
       <CCard>
-        <CCardHeader>
-          <h5>Current Order</h5>
-        </CCardHeader>
         <CCardBody>
+          <h3>Current Order</h3>
           <CTable bordered hover responsive>
             <CTableHead>
               <CTableRow>
@@ -452,7 +453,8 @@ const Orders = () => {
                       Tanggal: date ? date.toISOString().split('T')[0] : '',
                     })
                   }
-                  dateFormat="yyyy-MM-dd"
+                  dateFormat="dd MMMM yyyy"
+                  minDate={new Date()}
                   customInput={<CustomDateInput />}
                 />
               </CCol>
@@ -540,7 +542,7 @@ const Orders = () => {
                   <p>
                     <strong>Status:</strong>{' '}
                     <span
-                      className={`badge ${selectedPesanan.Status === 'Done' ? 'bg-success' : 'bg-danger'} ms-2`}
+                      className={`badge ${selectedPesanan.Status === 'Done' ? 'bg-success' : 'bg-warning'} ms-2`}
                     >
                       {selectedPesanan.Status}
                     </span>

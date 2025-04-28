@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
+import ID from 'date-fns/locale/id'
 import {
   CContainer,
   CRow,
@@ -163,11 +164,9 @@ const Karyawan = () => {
         </CCol>
       </CRow>
 
-      <CCard className="shadow-sm mb-4">
-        <CCardHeader>
-          <h5>Daftar Karyawan</h5>
-        </CCardHeader>
+      <CCard className="shadow-sm mb-3">
         <CCardBody>
+          <h3>Karyawan</h3>
           <CTable bordered hover responsive striped>
             <CTableHead>
               <CTableRow>
@@ -250,7 +249,8 @@ const Karyawan = () => {
                       Tanggal_Lahir: date ? date.toISOString().split('T')[0] : '',
                     })
                   }
-                  dateFormat="yyyy-MM-dd"
+                  locale={ID}
+                  dateFormat="dd MMMM yyyy"
                   showYearDropdown
                   scrollableYearDropdown
                   yearDropdownItemNumber={100}

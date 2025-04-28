@@ -65,27 +65,27 @@ if (userRole === 'admin') {
       to: '/admin/karyawan',
       icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
     },
-    {
-      component: CNavGroup,
-      name: 'Laporan',
-      icon: <CIcon icon={cilClipboard} customClassName="nav-icon" />,
-      items: [
-        {
-          component: CNavItem,
-          name: 'Pendapatan',
-          to: '/admin/pendapatan',
-          icon: <CIcon icon={cilChartLine} customClassName="nav-icon" />,
-          style: { paddingLeft: '8vh' },
-        },
-        {
-          component: CNavItem,
-          name: 'Pengeluaran',
-          to: '/admin/pengeluaran',
-          icon: <CIcon icon={cilCash} customClassName="nav-icon" />,
-          style: { paddingLeft: '8vh' },
-        },
-      ],
-    },
+    // {
+    //   component: CNavGroup,
+    //   name: 'Laporan',
+    //   icon: <CIcon icon={cilClipboard} customClassName="nav-icon" />,
+    //   items: [
+    //     {
+    //       component: CNavItem,
+    //       name: 'Pendapatan',
+    //       to: '/admin/pendapatan',
+    //       icon: <CIcon icon={cilChartLine} customClassName="nav-icon" />,
+    //       style: { paddingLeft: '8vh' },
+    //     },
+    //     {
+    //       component: CNavItem,
+    //       name: 'Pengeluaran',
+    //       to: '/admin/pengeluaran',
+    //       icon: <CIcon icon={cilCash} customClassName="nav-icon" />,
+    //       style: { paddingLeft: '8vh' },
+    //     },
+    //   ],
+    // },
   )
 }
 

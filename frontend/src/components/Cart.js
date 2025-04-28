@@ -20,17 +20,13 @@ import {
   CTableHeaderCell,
   CTableBody,
   CTableDataCell,
-  CPagination,
-  CPaginationItem,
   CForm,
   CFormLabel,
   CFormSelect,
   CFormInput,
-  CBadge,
   CAlert,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilList, cilChevronLeft, cilChevronRight } from '@coreui/icons'
 import { placeOrder, updateOrderStatus, getOrderStatus } from '../services/publicService'
 
 // Custom input untuk DatePicker menggunakan CoreUI CFormInput
@@ -44,11 +40,11 @@ const CustomDateInput = React.forwardRef(({ value, onClick, onChange, placeholde
   />
 ))
 
-// Generate pilihan waktu (dari jam 5:00 PM sampai 11:00 PM, interval 15 menit)
+// Generate pilihan waktu (dari jam 5:00 PM sampai 11:00 PM, interval 30 menit)
 const timeOptions = []
-for (let hour = 17; hour <= 22; hour++) {
+for (let hour = 17; hour <= 20; hour++) {
   for (let minute = 0; minute < 60; minute += 30) {
-    if (hour === 22 && minute > 0) continue
+    if (hour === 20 && minute > 0) continue // Batasi sampai pukul 20:00 tepat
     const formattedHour = hour.toString().padStart(2, '0')
     const formattedMinute = minute.toString().padStart(2, '0')
     const timeValue = `${formattedHour}:${formattedMinute}`
@@ -59,12 +55,15 @@ for (let hour = 17; hour <= 22; hour++) {
   }
 }
 
-const Cart = ({ cartItems, removeFromCart, clearCart }) => {
+/* 
+  Menambahkan properti theme (default "light") agar styling dapat disesuaikan.
+  Anda bisa mengintegrasikan properti theme ini dengan context, redux, atau mekanisme tema lain.
+*/
+const Cart = ({ cartItems, removeFromCart, clearCart, theme = 'light' }) => {
   const [isCartModalOpen, setIsCartModalOpen] = useState(false)
   const [isSuccessModalOpen, setSuccessModalOpen] = useState(false)
   const [paymentStatus, setPaymentStatus] = useState('Not Paid')
   const [isTimeValid, setIsTimeValid] = useState(false)
-  // Simpan tableDate sebagai objek Date agar mudah diproses oleh DatePicker
   const [tableDate, setTableDate] = useState(new Date())
   const [tableTime, setTableTime] = useState('')
   const [orderTotal, setOrderTotal] = useState(0)
@@ -72,7 +71,6 @@ const Cart = ({ cartItems, removeFromCart, clearCart }) => {
 
   const userEmail = sessionStorage.getItem('email')
 
-  // Validasi: jika tableTime diisi, waktu valid
   useEffect(() => {
     setIsTimeValid(!!tableTime)
   }, [tableTime])
@@ -82,10 +80,9 @@ const Cart = ({ cartItems, removeFromCart, clearCart }) => {
       alert('Silakan isi waktu pemesanan terlebih dahulu!')
       return
     }
-    // Siapkan data order
     const orderData = {
       Nama_Pelanggan: userEmail,
-      Tanggal: tableDate.toISOString().split('T')[0], // Format: YYYY-MM-DD
+      Tanggal: tableDate.toISOString().split('T')[0],
       Waktu: tableTime,
       Detail: cartItems.map((item) => ({
         'Nama Menu': item.name,
@@ -99,7 +96,7 @@ const Cart = ({ cartItems, removeFromCart, clearCart }) => {
       if (orderResult.status) {
         window.open(orderResult.payment_url)
       }
-      const newOrderId = orderResult.order_id // Backend mengembalikan order ID
+      const newOrderId = orderResult.order_id
       setOrderId(newOrderId)
       setOrderTotal(cartItems.reduce((total, item) => total + item.price * item.quantity, 0))
       clearCart()
@@ -120,11 +117,15 @@ const Cart = ({ cartItems, removeFromCart, clearCart }) => {
     }
   }
 
+  // Menentukan kelas yang digunakan berdasarkan tema
+  const cardThemeClass = theme === 'dark' ? 'bg-dark text-white' : 'bg-light text-dark'
+  const successCardThemeClass = theme === 'dark' ? 'bg-dark text-white' : 'bg-light text-dark'
+
   return (
     <>
       {/* Floating Cart Button */}
       <CCard
-        className="position-fixed shadow bg-dark text-white"
+        className={`position-fixed shadow ${cardThemeClass}`}
         style={{ bottom: '20px', right: '20px', width: '280px', cursor: 'pointer', zIndex: 1000 }}
         onClick={() => setIsCartModalOpen(true)}
       >
@@ -148,10 +149,10 @@ const Cart = ({ cartItems, removeFromCart, clearCart }) => {
 
       {/* Cart Modal */}
       <CModal visible={isCartModalOpen} onClose={() => setIsCartModalOpen(false)} size="lg">
-        <CModalHeader>
+        <CModalHeader className={cardThemeClass}>
           <CModalTitle className="fw-bold">🛒 Keranjang</CModalTitle>
         </CModalHeader>
-        <CModalBody>
+        <CModalBody className={cardThemeClass}>
           {cartItems.length === 0 ? (
             <CRow className="justify-content-center mt-4">
               <CCol xs={12} className="fs-5 text-center">
@@ -160,7 +161,7 @@ const Cart = ({ cartItems, removeFromCart, clearCart }) => {
             </CRow>
           ) : (
             <>
-              <CTable striped hover responsive>
+              <CTable striped hover responsive className={cardThemeClass}>
                 <CTableHead>
                   <CTableRow>
                     <CTableHeaderCell>#</CTableHeaderCell>
@@ -190,7 +191,6 @@ const Cart = ({ cartItems, removeFromCart, clearCart }) => {
                       </CTableDataCell>
                     </CTableRow>
                   ))}
-                  {/* Total Row */}
                   <CTableRow>
                     <CTableDataCell colSpan="4" className="text-end fw-bold fs-5 p-3">
                       Total:
@@ -206,9 +206,8 @@ const Cart = ({ cartItems, removeFromCart, clearCart }) => {
                 </CTableBody>
               </CTable>
               <hr />
-              <CForm>
+              <CForm className={cardThemeClass}>
                 <CRow className="mb-3">
-                  {/* Tanggal Pemesanan */}
                   <CCol xs={12} md={6}>
                     <CFormLabel className="fs-6 fw-bold">Tanggal Pemesanan</CFormLabel>
                     <div className="mt-2">
@@ -217,13 +216,13 @@ const Cart = ({ cartItems, removeFromCart, clearCart }) => {
                         selected={tableDate}
                         onChange={(date) => setTableDate(date)}
                         dateFormat="dd MMMM yyyy"
+                        minDate={new Date()}
+                        filterDate={(date) => date.getDay() !== 0} // disable Hari Minggu
                         customInput={<CustomDateInput />}
                         className="fs-6 w-100"
                       />
                     </div>
                   </CCol>
-
-                  {/* Waktu Pemesanan */}
                   <CCol xs={12} md={6}>
                     <CFormLabel className="fs-6 fw-bold">Waktu Pemesanan</CFormLabel>
                     <CFormSelect
@@ -241,11 +240,13 @@ const Cart = ({ cartItems, removeFromCart, clearCart }) => {
                     </CFormSelect>
                   </CCol>
                 </CRow>
-
                 <CRow className="mb-3">
                   <CCol>
                     <small className="text-muted d-block">
                       Lentera Grill buka dari jam 5:00 PM sampai 10:00 PM
+                    </small>
+                    <small className="text-muted d-block">
+                      Open Order dari jam 5:00 PM sampai 08:00 PM
                     </small>
                     {!isTimeValid && (
                       <small className="text-danger">Waktu pemesanan wajib diisi!</small>
@@ -256,7 +257,7 @@ const Cart = ({ cartItems, removeFromCart, clearCart }) => {
             </>
           )}
         </CModalBody>
-        <CModalFooter>
+        <CModalFooter className={cardThemeClass}>
           <CButton
             color="secondary"
             onClick={() => setIsCartModalOpen(false)}
@@ -270,7 +271,7 @@ const Cart = ({ cartItems, removeFromCart, clearCart }) => {
             className="fs-6 py-2 px-3"
             disabled={!isTimeValid || cartItems.length === 0}
           >
-            Bayar Sekarang
+            Bayar
           </CButton>
         </CModalFooter>
       </CModal>
@@ -287,7 +288,7 @@ const Cart = ({ cartItems, removeFromCart, clearCart }) => {
           background: 'rgba(0, 0, 0, 0.5)',
         }}
       >
-        <CCard className="p-4 bg-dark text-center" style={{ background: '#212631' }}>
+        <CCard className={`p-4 text-center ${successCardThemeClass}`}>
           {paymentStatus === 'Not Paid' ? (
             <>
               <h2>🎉 Pembayaran Berhasil!</h2>
@@ -296,7 +297,16 @@ const Cart = ({ cartItems, removeFromCart, clearCart }) => {
           ) : paymentStatus === 'Pending' ? (
             <>
               <h2>📱 Pembayaran Terkonfirmasi</h2>
-              <p>Silahkan menunggu pesanan anda dibuat.</p>
+              <p>Silahkan datang menunggu pesanan anda dibuat.</p>
+              <CCol xs="auto">
+                <CButton
+                  color="secondary"
+                  onClick={() => setSuccessModalOpen(false)}
+                  style={{ width: '150px' }}
+                >
+                  Tutup
+                </CButton>
+              </CCol>
             </>
           ) : (
             <>
@@ -312,15 +322,6 @@ const Cart = ({ cartItems, removeFromCart, clearCart }) => {
                 </CButton>
               </CCol>
             )}
-            <CCol xs="auto">
-              <CButton
-                color="secondary"
-                onClick={() => setSuccessModalOpen(false)}
-                style={{ width: '150px' }}
-              >
-                Tutup
-              </CButton>
-            </CCol>
           </CRow>
         </CCard>
       </CModal>

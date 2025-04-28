@@ -144,10 +144,8 @@ const OrderHistory = () => {
 
       {/* Order History Card */}
       <CCard>
-        <CCardHeader>
-          <h5>Order History</h5>
-        </CCardHeader>
         <CCardBody>
+          <h3>Order History</h3>
           <CTable hover responsive bordered>
             <CTableHead>
               <CTableRow>
